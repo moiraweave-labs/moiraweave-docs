@@ -92,35 +92,23 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
-      slugify: !!python/object:pymdownx.slugs.UnicodeSlugizer {}
   - pymdownx.arithmatex:
       block_tag: pre
   - pymdownx.betterem:
       smart_emphasis: true
-  - pymdownx.blocks.admonition
-  - pymdownx.blocks.details
-  - pymdownx.blocks.html
-  - pymdownx.blocks.tab:
-      alternate_style: true
   - pymdownx.caret
   - pymdownx.details
   - pymdownx.emoji:
       emoji_index: !!python/name:pymdownx.emoji.twemoji
       emoji_generator: !!python/name:pymdownx.emoji.to_svg
   - pymdownx.highlight:
-      auto_title: true
-      line_spans: __span
       use_pygments: true
   - pymdownx.inlinehilite
   - pymdownx.keys
   - pymdownx.mark
-  - pymdownx.pathconverter
-  - pymdownx.progressbar
   - pymdownx.saneheaders
   - pymdownx.smartsymbols
-  - pymdownx.snippets:
-      auto_append:
-        - includes/abbreviations.md
+  - pymdownx.snippets
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -128,8 +116,6 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
-      combine_header_slug: true
-      slugify: !!python/object:pymdownx.slugs.UnicodeSlugizer {}
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
