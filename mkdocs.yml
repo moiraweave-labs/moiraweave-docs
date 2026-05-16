@@ -94,8 +94,6 @@ markdown_extensions:
       permalink: true
   - pymdownx.arithmatex:
       block_tag: pre
-  - pymdownx.betterem:
-      smart_emphasis: true
   - pymdownx.caret
   - pymdownx.details
   - pymdownx.emoji:
