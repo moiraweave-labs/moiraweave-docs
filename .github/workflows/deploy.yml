@@ -34,10 +34,13 @@ jobs:
         run: uv venv
 
       - name: Install uv
-        run: pipx install uv
+        uses: astral-sh/setup-uv@v8.1.0
 
       - name: Install docs dependencies
         run: uv pip install -r requirements.txt
+
+      - name: Validate documentation
+        run: uv run mkdocs build --strict --verbose
 
       - name: Build documentation site
         run: uv run mkdocs build --strict

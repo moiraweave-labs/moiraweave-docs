@@ -68,6 +68,9 @@ steps/text-process-python/
   step.yaml
 ```
 
+### What is a Step?
+A step is a modular unit of work in MoiraWeave. Each step performs a specific task, such as data processing or transformation.
+
 ## 5. Define Your First Pipeline
 
 ```bash
