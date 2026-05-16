@@ -1,0 +1,85 @@
+:root {
+  /* Brand colors */
+  --md-primary-fg-color: #7c3aed;
+  --md-primary-fg-color--light: #a78bfa;
+  --md-primary-fg-color--dark: #6d28d9;
+  --md-accent-fg-color: #a855f7;
+  
+  /* Text colors */
+  --md-typeset-a-color: #7c3aed;
+  
+  /* Code colors */
+  --md-code-bg-color: #f3f4f6;
+  --md-code-fg-color: #1f2937;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-code-bg-color: #1f2937;
+  --md-code-fg-color: #f3f4f6;
+}
+
+/* Improve header styling */
+.md-header {
+  background-color: #ffffff;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+[data-md-color-scheme="slate"] .md-header {
+  background-color: #1f2937;
+  border-bottom: 2px solid #374151;
+}
+
+/* Improve sidebar */
+.md-nav {
+  font-size: 0.95rem;
+}
+
+/* Improve code blocks */
+.md-typeset code {
+  background-color: var(--md-code-bg-color);
+  color: var(--md-code-fg-color);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+}
+
+/* Improve admonition styling */
+.md-typeset .admonition {
+  border-radius: 6px;
+}
+
+/* Improve tables */
+.md-typeset table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.md-typeset table tbody tr:nth-child(odd) {
+  background-color: #f9fafb;
+}
+
+[data-md-color-scheme="slate"] .md-typeset table tbody tr:nth-child(odd) {
+  background-color: #374151;
+}
+
+/* Improve content width */
+.md-grid {
+  max-width: 1200px;
+}
+
+/* Improve TOC */
+.md-typeset .md-toc {
+  line-height: 1.6;
+}
+
+/* Improve links */
+.md-typeset a {
+  text-decoration: none;
+  border-bottom: 1px solid var(--md-typeset-a-color);
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+
+.md-typeset a:hover {
+  opacity: 1;
+  border-bottom-color: transparent;
+}

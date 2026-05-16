@@ -1,61 +1,135 @@
 site_name: MoiraWeave Docs
 site_description: Public documentation for the MoiraWeave MLOps platform
-site_url: https://moiraweave-labs.github.io/
+site_url: https://moiraweave-labs.github.io/moiraweave-docs/
 repo_name: moiraweave-docs
 repo_url: https://github.com/moiraweave-labs/moiraweave-docs
+edit_uri: edit/main/docs/
 
 theme:
   name: material
+  logo: assets/banner.svg
+  favicon: assets/banner.svg
   palette:
+    # Light mode (default)
     - scheme: default
       primary: deep purple
       accent: purple
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/lightbulb
+        name: Switch to light mode
   font:
     text: Roboto
     code: Roboto Mono
   features:
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.tracking
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.sections
     - navigation.expand
+    - navigation.indexes
     - navigation.top
     - navigation.footer
+    - toc.follow
+    - toc.integrate
     - search.highlight
     - search.suggest
+    - search.share
+    - content.action.edit
+    - content.action.view
     - content.code.copy
     - content.code.select
+    - content.code.annotate
     - content.tabs.link
-    - toc.follow
+    - content.footnote.backlinks
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/moiraweave-labs
+      name: GitHub
+  generator: false
+
+extra_css:
+  - stylesheets/extra.css
 
 plugins:
   - search:
       lang: en
+      separator: '[\s\-,:!=\[\]()"`/]+'
+  - minify:
+      minify_html: true
+      minify_css: true
+      minify_js: true
 
 nav:
   - Home: index.md
-  - Architecture: architecture.md
-  - Quickstart: quickstart.md
-  - Repository Structure: repo-structure.md
-  - Adding a Step: adding-a-step.md
-  - Adding a Pipeline: adding-a-pipeline.md
-  - Architecture Benchmark: architecture-benchmark.md
+  - Getting Started:
+      - Quickstart: quickstart.md
+      - Adding a Step: adding-a-step.md
+      - Adding a Pipeline: adding-a-pipeline.md
+  - Architecture:
+      - Overview: architecture.md
+      - Repository Structure: repo-structure.md
+      - Benchmark: architecture-benchmark.md
 
 markdown_extensions:
+  - abbr
   - admonition
   - attr_list
+  - def_list
+  - footnotes
   - md_in_html
   - meta
-  - pymdownx.details
-  - pymdownx.superfences
-  - pymdownx.tabbed:
+  - tables
+  - toc:
+      permalink: true
+      slugify: !!python/object:pymdownx.slugs.UnicodeSlugizer {}
+  - pymdownx.arithmatex:
+      block_tag: pre
+  - pymdownx.betterem:
+      smart_emphasis: true
+  - pymdownx.blocks.admonition
+  - pymdownx.blocks.details
+  - pymdownx.blocks.html
+  - pymdownx.blocks.tab:
       alternate_style: true
+  - pymdownx.caret
+  - pymdownx.details
   - pymdownx.emoji:
       emoji_index: !!python/name:pymdownx.emoji.twemoji
       emoji_generator: !!python/name:pymdownx.emoji.to_svg
   - pymdownx.highlight:
+      auto_title: true
+      line_spans: __span
       use_pygments: true
   - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - tables
-  - toc:
-      permalink: true
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.pathconverter
+  - pymdownx.progressbar
+  - pymdownx.saneheaders
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object:pymdownx.slugs.UnicodeSlugizer {}
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
