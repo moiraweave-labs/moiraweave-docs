@@ -6,15 +6,30 @@ repo_url: https://github.com/moiraweave-labs/moiraweave-docs
 
 theme:
   name: material
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: purple
+  font:
+    text: Roboto
+    code: Roboto Mono
   features:
     - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
+    - navigation.expand
     - navigation.top
+    - navigation.footer
     - search.highlight
+    - search.suggest
     - content.code.copy
+    - content.code.select
+    - content.tabs.link
+    - toc.follow
 
 plugins:
-  - search
+  - search:
+      lang: en
 
 nav:
   - Home: index.md
@@ -29,5 +44,18 @@ markdown_extensions:
   - admonition
   - attr_list
   - md_in_html
+  - meta
   - pymdownx.details
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:pymdownx.emoji.twemoji
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.highlight:
+      use_pygments: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables
+  - toc:
+      permalink: true
