@@ -150,7 +150,7 @@ Once your pipeline works locally, deploy to staging:
 moira pipeline deploy hello-world --env staging
 ```
 
-See [Deployment Guide](./deployment.md) for details.
+See the [Adding Custom Steps](adding-a-step.md) guide for details.
 
 ### Write Custom Step Logic
 
@@ -167,7 +167,7 @@ Edit `steps/text-process-python/app/step.py` to implement your business logic.
 
 ## Where to Go From Here
 
-- [Adding Custom Steps](./adding-a-step.md)
-- [Pipeline Best Practices](./pipeline-best-practices.md)
-- [Deployment to Kubernetes](./deployment.md)
-- [Project Structure Reference](./repo-structure.md)
+- [Adding Custom Steps](adding-a-step.md)
+- [Adding Pipelines](adding-a-pipeline.md)
+- [Architecture Overview](architecture.md)
+- [Project Structure Reference](repo-structure.md)
