@@ -10,4 +10,4 @@ To get started quickly, follow the [Quickstart Guide](docs/quickstart.md).
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions! Please refer to the [organization guidelines](https://github.com/moiraweave-labs/.github) for contribution guidelines and best practices.
