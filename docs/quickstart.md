@@ -12,7 +12,7 @@ Get your first MoiraWeave project running in under 10 minutes.
 ## 2. Install MoiraWeave CLI
 
 ```bash
-uv tool install git+https://github.com/moiraweave-labs/moiraweave-cli
+uv tool install moiraweave-cli
 ```
 
 Verify installation:
