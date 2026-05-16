@@ -30,6 +30,9 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Set up virtual environment
+        run: uv venv
+
       - name: Install uv
         run: pipx install uv
 
