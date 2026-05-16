@@ -1,4 +1,4 @@
-name: Docs Deploy
+name: Build & Deploy Docs
 
 on:
   push:
@@ -14,23 +14,26 @@ concurrency:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 env:
   PYTHON_VERSION: "3.13"
 
 jobs:
   build:
+    name: Build documentation
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ env.PYTHON_VERSION }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install uv
+      - name: Install and setup uv
         uses: astral-sh/setup-uv@v8.1.0
 
       - name: Create virtual environment
@@ -39,15 +42,23 @@ jobs:
       - name: Install documentation dependencies
         run: uv pip install -r requirements.txt
 
-      - name: Build and validate documentation
-        run: uv run mkdocs build --strict --verbose
+      - name: Build documentation
+        run: uv run mkdocs build --strict
 
+      - name: Upload documentation artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+
+  deploy:
+    name: Deploy to GitHub Pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
-        if: github.event_name == 'push'
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
+        id: deployment
+        uses: actions/deploy-pages@v4
