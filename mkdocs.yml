@@ -59,7 +59,7 @@ extra:
   generator: false
 
 extra_css:
-  - stylesheets/extra.css
+  - stylesheets/extra.v2.css
 
 plugins:
   - search:
