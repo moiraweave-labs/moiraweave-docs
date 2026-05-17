@@ -1,21 +1,43 @@
 # Adding a Pipeline
 
-## 1. Create the pipeline file
+Use this guide when you want to compose existing steps into a new workflow.
 
-Create `pipelines/<name>/pipeline.yaml` with step IDs, tasks, and URLs.
+## 1. Create the pipeline definition
 
-## 2. Validate contracts
+Create `pipelines/<name>/pipeline.yaml` and describe the workflow in terms of step ids, tasks, and service URLs.
 
-Run:
+Example:
+
+```yaml
+name: hello-world
+version: 1.0
+description: Hello World pipeline
+trigger:
+  type: redis-stream
+  stream: pipelines:hello-world:jobs
+steps:
+  - id: text-process
+    task: text-process
+    url: http://text-process-python:8000
+```
+
+## 2. Validate the contract graph
 
 ```bash
 moira pipeline validate <name>
 ```
 
-This checks required input/output compatibility between adjacent steps.
+Validation checks compatibility between adjacent steps before you run the workflow.
 
-## 3. Enable in Helm values
+## 3. Keep deployment settings workspace-owned
 
-Add `.Values.pipelines.<name>` in `infra/helm/moiraweave/values.yaml`.
+Pipeline definitions belong in the workspace. Any environment-specific deployment settings should stay with the repository or overlay that owns the environment, not in the shared runtime.
 
-No template changes are required in `infra/helm/moiraweave/templates/steps/`.
+## 4. Run and iterate
+
+```bash
+moira pipeline run <name> --input '{"text": "Hello MoiraWeave!"}'
+moira job status <job-id>
+```
+
+If the pipeline evolves, update the YAML, validate again, and keep the contract surface explicit.

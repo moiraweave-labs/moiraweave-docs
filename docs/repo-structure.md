@@ -1,174 +1,62 @@
 # Repository Structure and Ownership Model
 
-MoiraWeave is organized as a multi-repository project. Each repository has a clear ownership boundary and role.
+MoiraWeave is split into a few small repositories with explicit ownership.
 
-## Repository Map
+## Repository map
 
-### 1. moiraweave-cli (Your entry point)
+| Repository | Role | Owns |
+| --- | --- | --- |
+| `moiraweave-cli` | User entry point and scaffolding | Project initialization, step and pipeline commands, local deployment UX |
+| Customer workspace | Product implementation | Custom pipelines, custom steps, task contracts, deployment overlays, secrets |
+| `moiraweave-core` | Platform runtime | API gateway, worker, shared runtime code, infra templates, telemetry |
+| `moiraweave-steps` | Official catalog | Reusable step implementations and official task schemas |
+| `moiraweave-docs` | Public documentation | Tutorials, how-to guides, architecture, and reference material |
+| `.github` | Org-level policy | Shared templates, policies, and reusable workflows |
 
-**Role**: Developer UX and project scaffolding.
+## Ownership boundaries
 
-**You use it to**:
-- Create your workspace: `moira project init`
-- Define pipelines and steps in your workspace
-- Deploy locally or to Kubernetes
-- Manage your project configuration
+### `moiraweave-cli`
 
-**Structure**:
-```
-moiraweave-cli/
-  moira_cli/          # CLI source code (don't touch this)
-  tests/
-  pyproject.toml
-  README.md
-```
+Use this repository when you are changing the developer workflow itself: initialization, command behavior, or packaging of the CLI.
 
-### 2. Your Workspace (Customer-owned)
+### Customer workspace
 
-**Role**: Your project code and configuration.
+This is where business logic lives. A workspace owns pipelines, custom steps, task schemas, and environment-specific deployment settings.
 
-**Structure**:
-```
-your-company-moira/  (your repository)
-  moiraweave.yaml             # Project config (e.g., registry, environments)
-  .env                        # Secrets (don't commit)
-  pipelines/
-    <pipeline-name>/
-      pipeline.yaml           # Your pipeline definition
-  steps/
-    <task>-<impl>/            # Your custom steps
-      app/
-        step.py               # Implementation
-        config.py
-        main.py
-      tests/
-      Dockerfile
-      VERSION
-      pyproject.toml
-      step.yaml
-  tasks/
-    <task>/
-      schema.json             # Your task contract (if new)
-  deploy/
-    values-local.yaml         # Local deployment config
-    values-staging.yaml       # Staging deployment config
-    values-prod.yaml          # Production deployment config
-```
+### `moiraweave-core`
 
-**What you own**:
-- Pipeline definitions
-- Custom step implementations
-- Task contracts you define
-- Environment-specific deployment configuration
-- Secrets and credentials
+This repository owns the shared runtime and infrastructure surface. It should stay generic and should not carry customer pipelines or step-specific defaults.
 
-### 3. moiraweave-core (Platform runtime)
+### `moiraweave-steps`
 
-**Role**: Runtime services, infrastructure templates, and deployment orchestration.
+This repository is the official step catalog. It contains reusable implementations that can be consumed by workspaces, but it is not required for a normal workspace-only deployment.
 
-**What it owns**:
-- API gateway, worker services, monitoring
-- Helm charts, Kubernetes manifests, Terraform modules
-- Step SDK (the base class for steps)
-- Reference pipeline definitions (for documentation)
+### `moiraweave-docs`
 
-**What it does NOT own**:
-- Your project code
-- Your pipelines
-- Your custom steps
-- Your environment configuration
+This repository explains how the system works. It should stay clear, task-oriented, and aligned with the public ownership model.
 
-**Structure**:
-```
-moiraweave-core/
-  services/           # Platform services
-    api-gateway/
-    worker/
-    shared/
-    step-sdk/
-  infra/
-    helm/             # Helm charts for deployment
-    k8s/              # Kubernetes manifests
-    terraform/        # Terraform modules
-  tests/              # Integration tests
-```
+### `.github`
 
-### 4. moiraweave-steps (Official catalog)
+This repository stores organization-wide policy and workflow reuse.
 
-**Role**: Reusable, tested step implementations published by the team.
+## Decision guide
 
-**What it owns**:
-- Official step implementations (e.g., text-embed-fastembed)
-- Official task schemas
-- Published container images and versions
+| Question | Target repository |
+| --- | --- |
+| Is this customer-specific workflow or configuration? | Customer workspace |
+| Is this reusable platform behavior? | `moiraweave-core` |
+| Is this an official reusable step? | `moiraweave-steps` |
+| Is this CLI behavior? | `moiraweave-cli` |
+| Is this user-facing documentation? | `moiraweave-docs` |
+| Is this shared policy or template material? | `.github` |
 
-**What users do**:
-- Consume steps by reference and version via CLI
-- Do NOT clone this repository normally
-- Contribute new steps to the catalog (via PR)
+## Typical flow
 
-**Structure**:
-```
-moiraweave-steps/
-  steps/
-    text-embed-fastembed/     # Official step
-    vision-clip/              # Official step
-  tasks/
-    text-embed/schema.json    # Official task
-```
+1. Install the CLI.
+2. Create a workspace.
+3. Define or reuse tasks and steps.
+4. Compose a pipeline.
+5. Validate locally.
+6. Deploy against the shared runtime.
 
-### 5. moiraweave-docs (Documentation)
-
-**Role**: User-facing documentation, guides, and API reference.
-
-**What it owns**:
-- Quickstart guides (using CLI-first approach)
-- Architecture documentation
-- API reference
-- Deployment guides
-
-### 6. .github (Org-wide policies)
-
-**Role**: Shared community files and reusable workflows.
-
-**What it owns**:
-- Issue templates
-- PR templates
-- Security policy
-- Code of conduct
-- Org profile README
-
-## Ownership Decision Tree
-
-When deciding where code should live, ask:
-
-1. **Is it customer business logic or configuration?** → Your workspace
-2. **Is it a generic, reusable step?** → moiraweave-steps (if official) or your workspace (if custom)
-3. **Is it runtime platform code?** → moiraweave-core
-4. **Is it CLI and UX?** → moiraweave-cli
-5. **Is it documentation or community policy?** → moiraweave-docs or .github
-
-## Typical User Workflow
-
-```
-User installs CLI
-    ↓
-User creates workspace (moira project init)
-    ↓
-User defines pipelines and custom steps in workspace
-    ↓
-User optionally consumes official steps (moira step add --from-catalog)
-    ↓
-User validates and deploys from CLI
-    ↓
-Runtime (moiraweave-core) executes user's pipelines
-```
-
-**No cloning of moiraweave-core or moiraweave-steps required** for normal usage.
-
-## When Do You Need to Clone Upstream Repos?
-
-- **moiraweave-cli**: Only if contributing to the CLI itself
-- **moiraweave-core**: Only if contributing to platform or understanding internals
-- **moiraweave-steps**: Only if contributing official steps to the catalog
-- **moiraweave-docs**: Only if improving documentation
+You do not normally need to clone `moiraweave-core` or `moiraweave-steps` to use the platform.

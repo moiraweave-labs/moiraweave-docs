@@ -1,5 +1,5 @@
-site_name: MoiraWeave Docs
-site_description: Public documentation for the MoiraWeave MLOps platform
+site_name: MoiraWeave Documentation
+site_description: Practical documentation for the MoiraWeave MLOps platform
 site_url: https://moiraweave-labs.github.io/moiraweave-docs/
 repo_name: moiraweave-docs
 repo_url: https://github.com/moiraweave-labs/moiraweave-docs
@@ -12,21 +12,21 @@ theme:
   palette:
     # Light mode (default)
     - scheme: default
-      primary: deep purple
-      accent: purple
+      primary: blue
+      accent: cyan
       toggle:
         icon: material/lightbulb-outline
         name: Switch to dark mode
     # Dark mode
     - scheme: slate
-      primary: deep purple
-      accent: purple
+      primary: blue
+      accent: cyan
       toggle:
         icon: material/lightbulb
         name: Switch to light mode
   font:
-    text: Roboto
-    code: Roboto Mono
+    text: Manrope
+    code: IBM Plex Mono
   features:
     - navigation.instant
     - navigation.instant.prefetch
@@ -74,6 +74,7 @@ nav:
   - Home: index.md
   - Getting Started:
       - Quickstart: quickstart.md
+      - Concepts: concepts.md
       - Adding a Step: adding-a-step.md
       - Adding a Pipeline: adding-a-pipeline.md
   - Architecture:

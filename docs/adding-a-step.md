@@ -1,22 +1,10 @@
 # Adding a Custom Step
 
-This guide shows how to create custom steps in your MoiraWeave workspace.
+Use this guide when you need a new step inside your own workspace.
 
-## Where Your Steps Live
+> Custom steps live in the customer workspace. The official catalog is published separately in `moiraweave-steps`.
 
-Custom steps belong in your own project repository, not in moiraweave-steps:
-
-```
-your-workspace/
-  steps/
-    <task>-<impl>/        # Your custom step
-  tasks/
-    <task>/schema.json    # Your custom task contract
-```
-
-## Using the CLI (Recommended)
-
-The easiest way to scaffold a step:
+## 1. Scaffold the step
 
 ```bash
 moira step new <task> <implementation>
@@ -28,29 +16,26 @@ Example:
 moira step new fraud-detection ml-model
 ```
 
-This generates:
+Generated structure:
 
 ```
 steps/fraud-detection-ml-model/
   app/
-    __init__.py
-    config.py          # Settings via pydantic
-    step.py            # Implement here
-    main.py            # FastAPI entry
+    config.py
+    main.py
+    step.py
   tests/
-    conftest.py
-    test_step.py       # Add tests
-  VERSION              # Semantic version
-  step.yaml            # Step metadata
-  Dockerfile           # Container build
-  pyproject.toml       # Dependencies
+  VERSION
+  Dockerfile
+  pyproject.toml
+  step.yaml
 ```
 
-## Manual Steps (For Advanced Use)
+## 2. Define the task contract
 
-### 1. Define or Reuse a Task Schema
+Task contracts describe the input and output shape of the step. Create `tasks/<task>/schema.json` if the task is new, or reuse an existing contract if one already fits.
 
-Task schemas define input/output contracts. Create `tasks/<task>/schema.json` if the contract is new:
+Example:
 
 ```json
 {
@@ -75,69 +60,36 @@ Task schemas define input/output contracts. Create `tasks/<task>/schema.json` if
 }
 ```
 
-### 2. Implement Step Package
+## 3. Implement the service
 
-Create `steps/<task>-<impl>/` with:
-- `app/config.py` - Runtime settings
-- `app/step.py` - Step logic (inherit from BaseStep)
-- `app/main.py` - FastAPI server
-- `step.yaml` - Step metadata
-- `tests/` - Unit tests
-- `VERSION` - Semantic version file
-- `Dockerfile` - Container build
-- `pyproject.toml` - Python dependencies
+Keep the step package focused:
 
-### 3. Validate
+- `app/config.py` for runtime settings
+- `app/step.py` for the step implementation
+- `app/main.py` for the service entry point
+- `tests/` for unit coverage
+- `step.yaml` for metadata
+- `VERSION` for release management
+
+## 4. Validate locally
 
 ```bash
-# Run unit tests
 moira step test <task>-<impl>
-
-# Validate task contracts
 moira pipeline validate <pipeline-using-step>
 ```
 
-## Building and Pushing Your Step
+If validation fails, fix the contract mismatch before building an image.
 
-### Local Testing
+## 5. Build and publish
 
 ```bash
 moira step build fraud-detection-ml-model
-```
-
-### Push to Registry (for deployment)
-
-```bash
 moira step push fraud-detection-ml-model --bump patch
 ```
 
-This:
-1. Bumps the VERSION file.
-2. Builds the Docker image.
-3. Pushes to your registry (configured in moiraweave.yaml).
+`moira step push` bumps the version, builds the container image, and pushes it to the registry configured in the workspace.
 
-## Using Official Catalog Steps
-
-To use official steps from moiraweave-steps without creating custom ones:
-
-```bash
-moira step add --from-catalog text-embed-fastembed@1.0
-```
-
-This downloads and pins the official step reference in your workspace.
-
-## Step Lifecycle
-
-1. **Create**: `moira step new` or scaffold manually.
-2. **Develop**: Edit `app/step.py` and add tests.
-3. **Test**: `moira step test <step-name>`.
-4. **Build**: `moira step build <step-name>`.
-5. **Validate**: Use in pipeline and validate contracts.
-6. **Deploy**: `moira step push` if for production.
-
-## Next: Use Your Step in a Pipeline
-
-Once your step is ready, reference it in a pipeline definition:
+## 6. Use the step in a pipeline
 
 ```yaml
 steps:
@@ -146,4 +98,4 @@ steps:
     url: http://fraud-detection-ml-model:8000
 ```
 
-Then validate and run: `moira pipeline validate <name>` and `moira pipeline run <name>`.
+Once the pipeline references the step, validate it again and then run it end to end.

@@ -1,66 +1,46 @@
 # Quickstart
 
-Get your first MoiraWeave project running in under 10 minutes.
+This guide gets you from a blank workspace to a validated local run.
 
-## 1. Prerequisites
+## Prerequisites
 
-- Python 3.13+
-- `uv` package manager
-- Docker with Docker Compose
-- `curl` and `jq` (for health checks)
+- Python 3.13 or newer
+- `uv`
+- Docker and Docker Compose
+- `curl` and `jq` for health checks
 
-## 2. Install MoiraWeave CLI
+## 1. Install the CLI
 
 ```bash
 uv tool install moiraweave-cli
-```
-
-Verify installation:
-
-```bash
 moira --help
 ```
 
-## 3. Create Your Project
+If the command is available, the CLI is ready.
+
+## 2. Create a workspace
 
 ```bash
 moira project init
-```
-
-This scaffolds your workspace:
-
-```
-my-project-moira/
-  moiraweave.yaml
-  .env
-  pipelines/
-  steps/
-  tasks/
-  deploy/
-```
-
-Change to your project directory:
-
-```bash
 cd my-project-moira
 ```
 
-## 4. Scaffold Your First Step
+The workspace should now contain the project configuration, deployment overlays, pipelines, steps, and task contracts.
 
-Create a simple text processing step:
+## 3. Scaffold a first step
 
 ```bash
 moira step new text-process python
 ```
 
-This generates:
+Typical output:
 
 ```
 steps/text-process-python/
   app/
-    step.py        # Your step implementation
     config.py
     main.py
+    step.py
   tests/
   VERSION
   Dockerfile
@@ -68,10 +48,9 @@ steps/text-process-python/
   step.yaml
 ```
 
-### What is a Step?
-A step is a modular unit of work in MoiraWeave. Each step performs a specific task, such as data processing or transformation.
+Steps are the deployable units that implement a task contract.
 
-## 5. Define Your First Pipeline
+## 4. Define a pipeline
 
 ```bash
 moira pipeline new hello-world
@@ -87,87 +66,63 @@ trigger:
   type: redis-stream
   stream: pipelines:hello-world:jobs
 steps:
-  - id: step-1
+  - id: text-process
     task: text-process
     url: http://text-process-python:8000
 ```
 
-## 6. Validate Pipeline Contract
+## 5. Validate the contract
 
 ```bash
 moira pipeline validate hello-world
 ```
 
-Expected output:
+Expected result:
 
-```
+```bash
 ✓ Pipeline 'hello-world' is valid
 ```
 
-## 7. Run Locally
+Validation catches contract mismatches before you run the stack.
 
-Start the local development stack:
+## 6. Run the local stack
 
 ```bash
 moira pipeline dev hello-world
 ```
 
-This starts all required services (API gateway, worker, Redis, Qdrant) via Docker Compose.
+The local profile starts the API gateway, worker, Redis, and Qdrant through Docker Compose.
 
-Validate health:
+Check the health endpoint:
 
 ```bash
 curl -s http://localhost:8000/health | jq
 ```
 
-## 8. Run Your First Job
+## 7. Run a job
 
 ```bash
 moira pipeline run hello-world --input '{"text": "Hello MoiraWeave!"}'
 ```
 
-Check job status:
+Then inspect the job:
 
 ```bash
 moira job status <job-id>
 ```
 
-## Next Steps
+## Next steps
 
-### Add an Official Step from Catalog
-
-```bash
-moira step add --from-catalog text-embed-fastembed@1.0
-```
-
-Then reference it in your pipeline.
-
-### Deploy to Kubernetes
-
-Once your pipeline works locally, deploy to staging:
-
-```bash
-moira pipeline deploy hello-world --env staging
-```
-
-See the [Adding Custom Steps](adding-a-step.md) guide for details.
-
-### Write Custom Step Logic
-
-Edit `steps/text-process-python/app/step.py` to implement your business logic.
+- Add an official step from the catalog with `moira step add --from-catalog text-embed-fastembed@1.0`.
+- Read [Adding a Step](adding-a-step.md) to implement custom logic.
+- Read [Adding a Pipeline](adding-a-pipeline.md) to compose multiple steps.
+- Read [Architecture](architecture.md) to understand the runtime model.
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| `moira` command not found | Verify installation: `uv tool list` should show moiraweave-cli |
-| Docker Compose error | Ensure Docker is running: `docker ps` |
-| Health check fails | Wait 10-15 seconds for services to start, then retry |
-| Step not found | Verify step exists: `moira step list` |
-
-## Where to Go From Here
-
-- [Adding Custom Steps](adding-a-step.md)
-- [Adding Pipelines](adding-a-pipeline.md)
-- [Architecture Overview](architecture.md)
-- [Project Structure Reference](repo-structure.md)
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| `moira` command not found | CLI not installed in the active environment | Re-run `uv tool install moiraweave-cli` |
+| Docker Compose fails to start | Docker daemon is not running | Confirm `docker ps` works locally |
+| Health check still fails | Services are still booting | Wait a few seconds and retry |
+| Pipeline validation fails | Step or task contract mismatch | Re-run `moira pipeline validate <name>` and inspect the step contract |
