@@ -21,13 +21,21 @@ If the command is available, the CLI is ready.
 ## 2. Create a workspace
 
 ```bash
-moira project init
+moira init
 cd my-project-moira
 ```
 
 The workspace should now contain the project configuration, deployment overlays, pipelines, steps, and task contracts.
 
 ## 3. Scaffold a first step
+
+First create the task contract if it doesn't already exist:
+
+```bash
+moira task new text-process
+```
+
+Then scaffold the step:
 
 ```bash
 moira step new text-process python
@@ -36,12 +44,16 @@ moira step new text-process python
 Typical output:
 
 ```
-steps/text-process-python/
+.moiraweave/steps/text-process-python/
   app/
+    __init__.py
     config.py
     main.py
     step.py
   tests/
+    __init__.py
+    conftest.py
+    test_step.py
   VERSION
   Dockerfile
   pyproject.toml

@@ -19,12 +19,16 @@ moira step new fraud-detection ml-model
 Generated structure:
 
 ```
-steps/fraud-detection-ml-model/
+.moiraweave/steps/fraud-detection-ml-model/
   app/
+    __init__.py
     config.py
     main.py
     step.py
   tests/
+    __init__.py
+    conftest.py
+    test_step.py
   VERSION
   Dockerfile
   pyproject.toml
