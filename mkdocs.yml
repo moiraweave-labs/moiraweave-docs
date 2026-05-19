@@ -80,7 +80,6 @@ nav:
   - Architecture:
       - Overview: architecture.md
       - Repository Structure: repo-structure.md
-      - Benchmark: architecture-benchmark.md
 
 markdown_extensions:
   - abbr

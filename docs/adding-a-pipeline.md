@@ -6,7 +6,7 @@ Use this guide when you want to compose existing steps into a new workflow.
 
 Create `pipelines/<name>/pipeline.yaml` and describe the workflow in terms of step ids, tasks, and service URLs.
 
-Example:
+Single-step example:
 
 ```yaml
 name: hello-world
@@ -20,6 +20,28 @@ steps:
     task: text-process
     url: http://text-process-python:8000
 ```
+
+Multi-step example — embed text then index into a vector store:
+
+```yaml
+name: text-search-rag
+version: 1.0
+description: Embed documents and index them for vector search
+trigger:
+  type: redis-stream
+  stream: pipelines:text-search-rag:jobs
+steps:
+  - id: embed
+    task: text-embed
+    url: http://text-embed-fastembed:8000
+  - id: index
+    task: vector-index
+    url: http://vector-index-qdrant:8000
+    depends_on:
+      - embed
+```
+
+Each step declares a `task` (the contract it implements) and a `url` (the running service). `depends_on` expresses the execution order.
 
 ## 2. Validate the contract graph
 

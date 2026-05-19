@@ -105,11 +105,13 @@ moira pipeline dev hello-world
 
 The local profile starts the API gateway, worker, Redis, and Qdrant through Docker Compose.
 
-Check the health endpoint:
+Wait a few seconds for all services to be ready, then check the health endpoint:
 
 ```bash
 curl -s http://localhost:8000/health | jq
 ```
+
+The response should show `"status": "ok"`. If it does not, wait a few more seconds and retry — the worker and vector store may still be initialising.
 
 ## 7. Run a job
 
