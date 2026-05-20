@@ -37,11 +37,10 @@ steps:
   - id: index
     task: vector-index
     url: http://vector-index-qdrant:8000
-    depends_on:
-      - embed
+    input_from: embed
 ```
 
-Each step declares a `task` (the contract it implements) and a `url` (the running service). `depends_on` expresses the execution order.
+Each step declares a `task` (the contract it implements) and a `url` (the running service). `input_from` routes a specific upstream step's output to this step's input; omit it to receive the immediately preceding step's output.
 
 ## 2. Validate the contract graph
 
