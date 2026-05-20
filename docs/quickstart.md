@@ -99,11 +99,19 @@ Validation catches contract mismatches before you run the stack.
 
 ## 6. Run the local stack
 
+Before starting the stack, build the step image locally:
+
+```bash
+moira step build text-process-python
+```
+
+Then start all services with:
+
 ```bash
 moira pipeline dev hello-world
 ```
 
-The local profile starts the API gateway, worker, Redis, and Qdrant through Docker Compose.
+The command generates a `docker-compose.override.yml` with your step service and starts the full stack: API gateway, worker, Redis, Qdrant, and your step container.
 
 Wait a few seconds for all services to be ready, then check the health endpoint:
 
@@ -127,6 +135,7 @@ moira job status <job-id>
 
 ## Next steps
 
+- Push your step to a registry: authenticate first with `docker login ghcr.io`, then run `moira step push text-process-python`.
 - Add an official step from the catalog with `moira step add --from-catalog text-embed-fastembed@1.0`.
 - Read [Adding a Step](adding-a-step.md) to implement custom logic.
 - Read [Adding a Pipeline](adding-a-pipeline.md) to compose multiple steps.
