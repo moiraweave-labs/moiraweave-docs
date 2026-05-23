@@ -1,13 +1,12 @@
 # Quickstart
 
-This guide gets you from a blank workspace to a validated local run.
+This guide gets you from an empty workspace to a local agent workload.
 
 ## Prerequisites
 
 - Python 3.13 or newer
 - `uv`
 - Docker and Docker Compose
-- `curl` and `jq` for health checks
 
 ## 1. Install the CLI
 
@@ -16,136 +15,99 @@ uv tool install moiraweave-cli
 moira --help
 ```
 
-If the command is available, the CLI is ready.
-
-## 2. Create a workspace
+## 2. Create a Workspace
 
 ```bash
-moira init
-cd my-project-moira
+mkdir my-moiraweave-workspace
+cd my-moiraweave-workspace
+moira init --non-interactive
 ```
 
-The workspace should now contain the project configuration, deployment overlays, pipelines, steps, and task contracts.
+The workspace contains:
 
-## 3. Scaffold a first step
+```text
+.moiraweave/
+  workloads/
+  artifacts/
+  deploy/
+moiraweave.yaml
+.env
+docker-compose.yml
+```
 
-First create the task contract if it doesn't already exist:
+## 3. Create an Agent Workload
 
 ```bash
-moira task new text-process
+moira workload new hermes \
+  --type agent-service \
+  --image ghcr.io/nousresearch/hermes-agent:latest \
+  --mode session \
+  --timeout-seconds 172800 \
+  --adapter hermes \
+  --port 8000 \
+  --secret OPENAI_API_KEY \
+  --persistence \
+  --mount-path /data \
+  --workspace-mount /workspace
 ```
 
-Then scaffold the step:
+This writes `.moiraweave/workloads/hermes/workload.yaml`.
+
+## 4. Generate Local Deployment Assets
 
 ```bash
-moira step new text-process python
+moira deploy local
 ```
 
-Typical output:
-
-```
-.moiraweave/steps/text-process-python/
-  app/
-    __init__.py
-    config.py
-    main.py
-    step.py
-  tests/
-    __init__.py
-    conftest.py
-    test_step.py
-  VERSION
-  Dockerfile
-  pyproject.toml
-  step.yaml
-```
-
-Steps are the deployable units that implement a task contract.
-
-## 4. Define a pipeline
+Set required secrets in `.env`, then start the stack:
 
 ```bash
-moira pipeline new hello-world
+docker compose -f docker-compose.yml -f .moiraweave/deploy/docker-compose.workloads.yml up -d
 ```
 
-Edit `pipelines/hello-world/pipeline.yaml`:
-
-```yaml
-name: hello-world
-version: 1.0
-description: Hello World pipeline
-trigger:
-  type: redis-stream
-  stream: pipelines:hello-world:jobs
-steps:
-  - id: text-process
-    task: text-process
-    url: http://text-process-python:8000
-```
-
-## 5. Validate the contract
+## 5. Register And Run
 
 ```bash
-moira pipeline validate hello-world
+export MOIRA_TOKEN=<token>
+moira workload deploy hermes
+moira workload status hermes
+moira agent session create hermes
+moira agent session message hermes <session-id> "hello" --watch
 ```
 
-Expected result:
+The API stores the session, user message, queued run, worker events, assistant
+message, and any artifact metadata.
+
+## 6. Use The Dashboard
+
+Start the optional UI profile if your workspace compose file includes it:
 
 ```bash
-✓ Pipeline 'hello-world' is valid
+docker compose --profile ui up -d
 ```
 
-Validation catches contract mismatches before you run the stack.
+Open the dashboard and inspect:
 
-## 6. Run the local stack
+- Workloads
+- Runs and run timeline
+- Agent sessions and chat
+- Artifacts
+- Deployment health
 
-Before starting the stack, build the step image locally:
+To test the channel gateway shape without a real Telegram or Slack bot:
 
 ```bash
-moira step build text-process-python
+moira agent channel-message hermes telegram user-123 "hello from telegram"
 ```
 
-Then start all services with:
-
-```bash
-moira pipeline dev hello-world
-```
-
-The command generates a `docker-compose.override.yml` with your step service and starts the full stack: API gateway, worker, Redis, Qdrant, and your step container.
-
-Wait a few seconds for all services to be ready, then check the health endpoint:
-
-```bash
-curl -s http://localhost:8000/health | jq
-```
-
-The response should show `"status": "ok"`. If it does not, wait a few more seconds and retry — the worker and vector store may still be initialising.
-
-## 7. Run a job
-
-```bash
-moira pipeline run hello-world --input '{"text": "Hello MoiraWeave!"}'
-```
-
-Then inspect the job:
-
-```bash
-moira job status <job-id>
-```
-
-## Next steps
-
-- Push your step to a registry: authenticate first with `docker login ghcr.io`, then run `moira step push text-process-python`.
-- Add an official step from the catalog with `moira step add --from-catalog text-embed-fastembed@1.0`.
-- Read [Adding a Step](adding-a-step.md) to implement custom logic.
-- Read [Adding a Pipeline](adding-a-pipeline.md) to compose multiple steps.
-- Read [Architecture](architecture.md) to understand the runtime model.
+This creates or reuses a MoiraWeave agent session, records channel audit
+metadata, queues a run, and keeps the interaction visible in the dashboard.
 
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
-| `moira` command not found | CLI not installed in the active environment | Re-run `uv tool install moiraweave-cli` |
-| Docker Compose fails to start | Docker daemon is not running | Confirm `docker ps` works locally |
-| Health check still fails | Services are still booting | Wait a few seconds and retry |
-| Pipeline validation fails | Step or task contract mismatch | Re-run `moira pipeline validate <name>` and inspect the step contract |
+| `moira` command not found | CLI is not installed in the active shell | Re-run `uv tool install moiraweave-cli` |
+| Workload is registered but not reachable | Compose or Kubernetes workload service is not deployed | Run `moira deploy local` or inspect workload logs |
+| Agent message stays queued | Worker is not running or Redis is unavailable | Check `/ready`, worker logs, and Redis connectivity |
+| Agent run fails after dispatch timeout | Runtime did not acknowledge quickly | Configure the adapter path or make the agent return an ack before long work |

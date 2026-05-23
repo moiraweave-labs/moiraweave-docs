@@ -1,56 +1,48 @@
 <div class="mw-hero">
 	<div class="mw-hero__eyebrow">MoiraWeave Documentation</div>
 	<div class="mw-hero__body">
-		<h1>Build modular MLOps workflows without coupling them to the runtime.</h1>
-		<p>MoiraWeave separates workspace-owned pipelines and steps from the shared platform runtime, so teams can move quickly without losing operational clarity.</p>
+		<h1>Operate models, pipelines, and agents from one self-hosted control plane.</h1>
+		<p>MoiraWeave deploys AI workloads and gives teams sessions, runs, events, cancellation, artifacts, health, and an Ops dashboard without replacing the internals of their agent runtimes.</p>
 		<div class="mw-hero__actions">
 			<a class="md-button md-button--primary" href="quickstart/">Start with the quickstart</a>
-			<a class="md-button" href="concepts/">Read the concepts</a>
+			<a class="md-button" href="agent-ops-architecture/">See the architecture</a>
 		</div>
 	</div>
 </div>
 
-## What this site covers
-
-The documentation is organized by intent, not by repository. Start with the path that matches what you are trying to do.
+## What This Site Covers
 
 <div class="mw-grid">
 	<a class="mw-card" href="quickstart/">
 		<span class="mw-card__kicker">Get running</span>
 		<span class="mw-card__title">Quickstart</span>
-		<span class="mw-card__text">Create a workspace, scaffold a first step, define a pipeline, and run the stack locally.</span>
+		<span class="mw-card__text">Create a workspace, define an agent workload, deploy locally, and send the first message.</span>
 	</a>
 	<a class="mw-card" href="concepts/">
 		<span class="mw-card__kicker">Understand the model</span>
 		<span class="mw-card__title">Concepts</span>
-		<span class="mw-card__text">Learn the difference between workspace, task, step, pipeline, catalog, and runtime.</span>
+		<span class="mw-card__text">Learn workloads, runs, sessions, events, artifacts, and agent boundaries.</span>
+	</a>
+	<a class="mw-card" href="agent-ops-architecture/">
+		<span class="mw-card__kicker">See the system</span>
+		<span class="mw-card__title">Agent Operations</span>
+		<span class="mw-card__text">Review C4 diagrams and the agent message, cancellation, and artifact flow.</span>
 	</a>
 	<a class="mw-card" href="architecture/">
-		<span class="mw-card__kicker">See the system</span>
+		<span class="mw-card__kicker">Runtime design</span>
 		<span class="mw-card__title">Architecture</span>
-		<span class="mw-card__text">Review the ownership boundaries, execution flow, and platform trade-offs.</span>
-	</a>
-	<a class="mw-card" href="adding-a-step/">
-		<span class="mw-card__kicker">Extend the platform</span>
-		<span class="mw-card__title">Adding a Step</span>
-		<span class="mw-card__text">Scaffold a custom step in your workspace or publish a reusable one to the catalog.</span>
-	</a>
-	<a class="mw-card" href="adding-a-pipeline/">
-		<span class="mw-card__kicker">Compose workflows</span>
-		<span class="mw-card__title">Adding a Pipeline</span>
-		<span class="mw-card__text">Define declarative pipelines, validate contracts, and keep deployment settings workspace-owned.</span>
+		<span class="mw-card__text">Review ownership boundaries, execution flow, and platform trade-offs.</span>
 	</a>
 	<a class="mw-card" href="repo-structure/">
 		<span class="mw-card__kicker">Find the boundaries</span>
 		<span class="mw-card__title">Repository Structure</span>
-		<span class="mw-card__text">See which repository owns platform code, catalog content, docs, and community policy.</span>
+		<span class="mw-card__text">See which repository owns runtime code, CLI, UI, docs, and policy.</span>
 	</a>
 </div>
 
-## Documentation principles
+## Documentation Principles
 
-- Use the quickstart when you want a first successful run.
-- Use concepts when you need the vocabulary and ownership model.
-- Use architecture when you need the reasoning behind the design.
-- Use the how-to guides when you need to add or change something.
-- Use repository structure as the map for where things live.
+- Use the quickstart for a first local run.
+- Use concepts for vocabulary and ownership.
+- Use agent operations when integrating Hermes, OpenClaw, LangGraph, or custom runtimes.
+- Use architecture and repository structure when changing the platform itself.

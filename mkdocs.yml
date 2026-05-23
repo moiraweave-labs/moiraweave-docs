@@ -1,5 +1,5 @@
 site_name: MoiraWeave Documentation
-site_description: Practical documentation for the MoiraWeave MLOps platform
+site_description: Practical documentation for the MoiraWeave AI workload and agent operations platform
 site_url: https://moiraweave-labs.github.io/moiraweave-docs/
 repo_name: moiraweave-docs
 repo_url: https://github.com/moiraweave-labs/moiraweave-docs
@@ -75,10 +75,9 @@ nav:
   - Getting Started:
       - Quickstart: quickstart.md
       - Concepts: concepts.md
-      - Adding a Step: adding-a-step.md
-      - Adding a Pipeline: adding-a-pipeline.md
   - Architecture:
       - Overview: architecture.md
+      - Agent Operations: agent-ops-architecture.md
       - Repository Structure: repo-structure.md
 
 markdown_extensions:

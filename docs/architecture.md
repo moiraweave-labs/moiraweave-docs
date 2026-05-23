@@ -1,57 +1,52 @@
 # Architecture
 
-MoiraWeave is designed around a narrow runtime and explicit ownership boundaries.
+MoiraWeave is designed around a narrow runtime and explicit ownership
+boundaries. It operates AI workloads without embedding customer business logic
+or agent internals.
 
-## The three layers
+## Layers
 
 | Layer | Responsibility | Owned by |
 | --- | --- | --- |
-| Workspace layer | Pipelines, custom steps, task contracts, and environment overlays | The team using MoiraWeave |
-| Catalog layer | Curated reusable steps and official task implementations | `moiraweave-steps` |
-| Runtime layer | API gateway, worker, orchestration, persistence, observability, and deployment primitives | `moiraweave-core` |
+| Workspace layer | Workload manifests, deployment values, artifacts, and secrets | The team using MoiraWeave |
+| Runtime layer | API gateway, worker, control-plane storage, queueing, deployment templates, and observability | `moiraweave-core` |
+| Experience layer | CLI and optional Ops dashboard | `moiraweave-cli`, `moiraweave-ui` |
 
-## What each layer does
+## Runtime Services
 
-### Workspace layer
+- API gateway: auth, workload registration, run submission, sessions, messages, events, artifacts, and health.
+- Worker: consumes Redis dispatch messages and calls model, pipeline, or agent executors.
+- Postgres: source of truth for workloads, runs, sessions, messages, events, and artifact metadata.
+- Redis Streams: queue and short-lived coordination layer.
+- Qdrant: optional vector store for RAG/search workloads.
+- UI: browser console for workloads, runs, agent sessions, artifacts, and deployment health.
 
-- Defines the business workflow.
-- Stores pipeline YAML and custom step code.
-- Owns deployment-specific values and secrets.
-- Changes frequently and should remain isolated from the shared runtime.
+## End-to-End Run Flow
 
-### Catalog layer
+1. A user submits a workload run through CLI, UI, or API.
+2. The API stores the run in Postgres and dispatches a message to Redis Streams.
+3. The worker consumes the message and marks the run `starting` then `running`.
+4. The executor calls the workload according to its type.
+5. The worker stores events, assistant messages, artifacts, result, and final state.
+6. UI and CLI read from the API only.
 
-- Publishes reusable step implementations.
-- Keeps versioned contracts stable for consumers.
-- Serves as an optional acceleration path, not a hard dependency.
+## Agent Flow
 
-### Runtime layer
+Agent workloads use an adapter. The adapter sends a short-lived dispatch call to
+the agent runtime, then MoiraWeave tracks the run through stored state and
+events. Hermes, OpenClaw, LangGraph, or custom agents keep their own internal
+reasoning loop.
 
-- Exposes the API used to submit, track, and inspect jobs.
-- Dispatches work to the configured step services.
-- Persists state and emits telemetry.
-- Stays generic so it can execute any compatible workspace pipeline.
+## Design Decisions
 
-## End-to-end flow
+- Use one `workload.yaml` model for Compose, Kubernetes, API validation, and worker dispatch.
+- Keep Postgres as the durable control plane.
+- Keep Redis out of durable state.
+- Keep UI/API as the canonical interaction surface.
+- Model Telegram, Slack, Discord, and webhooks as connectors into MoiraWeave, not direct agent access.
 
-1. A user submits a pipeline job through the CLI or API.
-2. The gateway validates the request and stores the job record.
-3. The worker consumes the job from Redis Streams.
-4. The runtime resolves the pipeline definition and step endpoints from the workspace.
-5. Each step executes against its contract and returns data for the next stage.
-6. The runtime records completion, failure, and trace information for inspection.
-
-## Design decisions
-
-- Keep pipelines declarative so orchestration is inspectable.
-- Keep the runtime generic so no default domain pipelines leak into the platform.
-- Keep task contracts explicit so compatibility failures appear early.
-- Keep the workspace as the unit of customization so teams can own their delivery lifecycle.
-
-## Further reading
+## Further Reading
 
 - [Concepts](concepts.md)
+- [Agent Operations Architecture](agent-ops-architecture.md)
 - [Repository Structure](repo-structure.md)
-- [Architecture Benchmark](architecture-benchmark.md)
-
-See the [architecture diagram](assets/architecture.svg) for a compact visual summary.
