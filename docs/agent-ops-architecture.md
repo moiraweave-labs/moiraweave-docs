@@ -160,6 +160,6 @@ checks, and adapter status calls instead of holding a request open for hours.
 
 - `POST /v1/workloads/{name}/deployments`: record local or Kubernetes deployment state.
 - `GET /v1/deployments`: list deployment records visible to the authenticated user.
-- `GET /v1/workloads/{name}/health`: summarize health from deployment state.
+- `GET /v1/workloads/{name}/health`: summarize health from deployment state and probe deployment endpoints when present.
 - `POST /v1/channels/{channel}/agents/{name}/messages`: authenticated inbound channel bridge.
 - `GET /v1/agents/{name}/sessions/{session_id}/health`: summarize a session and its latest run.
