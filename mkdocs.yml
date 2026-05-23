@@ -78,6 +78,7 @@ nav:
   - Architecture:
       - Overview: architecture.md
       - Agent Operations: agent-ops-architecture.md
+      - Agent Runtime Integrations: agent-runtime-integrations.md
       - Repository Structure: repo-structure.md
 
 markdown_extensions:

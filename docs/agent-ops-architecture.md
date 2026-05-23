@@ -148,6 +148,7 @@ Agent runtimes own:
 Every agent adapter exposes the same operational shape:
 
 - `send_message(payload)`: short-lived dispatch call
+- `wait_for_completion(payload, accepted)`: follow runtime status/events until terminal state or timeout
 - `get_status(payload)`: check runtime or session health
 - `cancel(payload)`: cooperative cancellation hook
 - `list_artifacts(payload)`: discover runtime-produced artifacts
@@ -155,6 +156,9 @@ Every agent adapter exposes the same operational shape:
 Long-running agents should acknowledge a message quickly and continue work in
 their own process. MoiraWeave follows progress through stored events, health
 checks, and adapter status calls instead of holding a request open for hours.
+
+Runtime-specific details live in
+[Agent Runtime Integrations](agent-runtime-integrations.md).
 
 ## Current API Surface
 

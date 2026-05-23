@@ -48,8 +48,15 @@ moira workload new hermes \
   --mode session \
   --timeout-seconds 172800 \
   --adapter hermes \
-  --port 8000 \
+  --port 8642 \
+  --env API_SERVER_ENABLED=true \
+  --env API_SERVER_HOST=0.0.0.0 \
+  --env API_SERVER_PORT=8642 \
+  --env 'API_SERVER_KEY=${HERMES_API_SERVER_KEY}' \
   --secret OPENAI_API_KEY \
+  --secret HERMES_API_SERVER_KEY \
+  --auth-token-env HERMES_API_SERVER_KEY \
+  --model hermes-agent \
   --persistence \
   --mount-path /data \
   --workspace-mount /workspace
