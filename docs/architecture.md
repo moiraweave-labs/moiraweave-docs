@@ -10,7 +10,7 @@ or agent internals.
 | --- | --- | --- |
 | Workspace layer | Workload manifests, deployment values, artifacts, and secrets | The team using MoiraWeave |
 | Runtime layer | API gateway, worker, control-plane storage, queueing, deployment templates, and observability | `moiraweave-core` |
-| Experience layer | CLI and optional Ops dashboard | `moiraweave-cli`, `moiraweave-ui` |
+| Experience layer | CLI and integrated Ops dashboard | `moiraweave-cli`, `moiraweave-ui` |
 
 ## Runtime Services
 

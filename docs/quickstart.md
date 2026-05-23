@@ -35,6 +35,10 @@ moiraweave.yaml
 docker-compose.yml
 ```
 
+The generated Compose stack includes the Ops dashboard. By default it is served
+at `http://localhost:3000` and proxies API calls to the gateway service inside
+the Compose network.
+
 ## 3. Create an Agent Workload
 
 ```bash
@@ -59,7 +63,7 @@ This writes `.moiraweave/workloads/hermes/workload.yaml`.
 moira deploy local
 ```
 
-Set required secrets in `.env`, then start the stack:
+Set required secrets in `.env`, then start the platform and workload services:
 
 ```bash
 docker compose -f docker-compose.yml -f .moiraweave/deploy/docker-compose.workloads.yml up -d
@@ -80,13 +84,7 @@ message, and any artifact metadata.
 
 ## 6. Use The Dashboard
 
-Start the optional UI profile if your workspace compose file includes it:
-
-```bash
-docker compose --profile ui up -d
-```
-
-Open the dashboard and inspect:
+Open `http://localhost:3000` and inspect:
 
 - Workloads
 - Runs and run timeline
