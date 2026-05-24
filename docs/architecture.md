@@ -63,6 +63,18 @@ The monitoring stack is intentionally separate from workload placement. Managed
 agent/model workloads may expose their own metrics endpoints later, but the
 core control-plane metrics are deployed with the platform monitoring install.
 
+## UI And CLI Boundary
+
+The Ops dashboard covers API-level operations: workload manifest registration,
+run submission, run cancellation, live events, artifacts, agent sessions,
+agent messages, channel simulation, deployment records, and health.
+
+The CLI is still required for workspace-local actions that need filesystem,
+Docker, Helm, or Kubernetes credentials: `moira init`, Compose/Helm generation,
+`deploy local --up`, `deploy k8s --apply`, logs, and undeploy-style operations.
+The UI deliberately talks only to the API gateway and does not get direct
+access to Redis, Docker, Kubernetes, or local files.
+
 ## Design Decisions
 
 - Use one `workload.yaml` model for Compose, Kubernetes, API validation, and worker dispatch.

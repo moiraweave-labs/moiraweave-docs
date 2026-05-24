@@ -225,6 +225,11 @@ Use `MOIRAWEAVE_REAL_HERMES_AUTH_TOKEN_ENV` or
 token. The variable value should be the name of the env var containing the
 token, for example `HERMES_API_SERVER_KEY`.
 
+The core repository also exposes a manual GitHub Actions workflow named
+`Live Agent Integrations`. Dispatch it with `hermes_url` and/or `openclaw_url`.
+If the runtimes require tokens, configure repository secrets named
+`HERMES_API_SERVER_KEY` and `OPENCLAW_GATEWAY_TOKEN`.
+
 ## Sources
 
 - Hermes Agent API Server: https://hermes-agent.nousresearch.com/docs/user-guide/features/api-server/
