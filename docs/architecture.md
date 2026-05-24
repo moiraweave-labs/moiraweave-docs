@@ -67,13 +67,16 @@ core control-plane metrics are deployed with the platform monitoring install.
 
 The Ops dashboard covers API-level operations: workload manifest registration,
 run submission, run cancellation, live events, artifacts, agent sessions,
-agent messages, channel simulation, deployment records, and health.
+agent messages, channel simulation, deployment planning, deployment records,
+and health.
 
+The API can return a deployment plan for each workload and target, including
+generated files, service endpoint, and the CLI/Helm commands needed to apply it.
 The CLI is still required for workspace-local actions that need filesystem,
 Docker, Helm, or Kubernetes credentials: `moira init`, Compose/Helm generation,
 `deploy local --up`, `deploy k8s --apply`, logs, and undeploy-style operations.
-The UI deliberately talks only to the API gateway and does not get direct
-access to Redis, Docker, Kubernetes, or local files.
+The UI deliberately talks only to the API gateway and does not get direct access
+to Redis, Docker, Kubernetes, or local files.
 
 ## Design Decisions
 
