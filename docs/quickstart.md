@@ -85,13 +85,17 @@ docker compose -f docker-compose.yml -f .moiraweave/deploy/docker-compose.worklo
 ```bash
 export MOIRA_TOKEN=<token>
 moira workload deploy hermes
+moira deploy local --register
 moira workload status hermes
 moira agent session create hermes
 moira agent session message hermes <session-id> "hello" --watch
 ```
 
-The API stores the session, user message, queued run, worker events, assistant
-message, and any artifact metadata.
+`moira workload deploy` stores the workload manifest in the API.
+`moira deploy local --register` stores the local deployment record and endpoint
+used by health checks and the dashboard. The API also stores the session, user
+message, queued run, worker events, assistant message, and any artifact
+metadata.
 
 Managed local workloads are attached to the same Compose network as the worker,
 so the Hermes runtime is reachable as `http://hermes:8642`. For an already

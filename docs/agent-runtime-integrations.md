@@ -37,6 +37,13 @@ Managed workloads use a stable service name. By default it is
 Compose and Kubernetes. Set `deployment.serviceName` only when the runtime must
 use a different DNS name.
 
+Multiple agents are represented as multiple workloads. For example, `hermes`
+and `openclaw` can be deployed together as separate services as long as each
+workload has its own `metadata.name`, service name, ports, secrets, and adapter
+configuration. MoiraWeave sessions and runs are scoped by workload name, so two
+agents can run concurrently without sharing conversation ids or deployment
+records.
+
 ## Hermes Agent
 
 Hermes is the cleanest runtime to integrate because its API server exposes the
@@ -170,6 +177,12 @@ spec:
     adapter: hermes
 ```
 
+When the manifest is registered with `moira deploy local --register` or
+`moira deploy k8s --register`, external agents are recorded as
+`target: external` with their `spec.endpoint`. That lets the dashboard and
+health API show the runtime location even though deployment is owned outside
+MoiraWeave.
+
 ## Long-Running Behavior
 
 Agent turns can run for hours or days. The production pattern is:
@@ -186,6 +199,31 @@ Agent turns can run for hours or days. The production pattern is:
 For very high concurrency, the next evolution is to split dispatch and
 reconciliation into separate queues so a worker process does not stay attached
 to every long-running agent turn.
+
+## Runtime Test Levels
+
+MoiraWeave uses three test levels for agent integrations:
+
+- Contract tests in CI mock the Hermes HTTP API and OpenClaw Gateway protocol.
+  These prove request shapes, status polling, cancellation, artifact discovery,
+  and fallback behavior without requiring paid providers or long-running
+  runtime containers.
+- Compose E2E tests use mock agents and models to validate the MoiraWeave
+  control plane, Redis dispatch, event storage, cancellation, and artifacts.
+- Optional live-runtime tests can be run against real Hermes/OpenClaw endpoints.
+  They are skipped by default and enabled with environment variables:
+
+```bash
+MOIRAWEAVE_REAL_AGENT_TESTS=1 \
+MOIRAWEAVE_REAL_HERMES_URL=http://localhost:8642 \
+MOIRAWEAVE_REAL_OPENCLAW_URL=http://localhost:18789 \
+uv run pytest services/worker/tests/test_real_agent_runtimes.py
+```
+
+Use `MOIRAWEAVE_REAL_HERMES_AUTH_TOKEN_ENV` or
+`MOIRAWEAVE_REAL_OPENCLAW_AUTH_TOKEN_ENV` when the runtime requires a bearer
+token. The variable value should be the name of the env var containing the
+token, for example `HERMES_API_SERVER_KEY`.
 
 ## Sources
 

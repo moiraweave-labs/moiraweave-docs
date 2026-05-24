@@ -43,6 +43,26 @@ network/namespace as the worker. External runtimes are not deployed by
 MoiraWeave; the manifest records `spec.endpoint`, and the adapter uses that
 URL.
 
+MoiraWeave supports multiple agents by treating each runtime/profile as its own
+workload. A Hermes service, an OpenClaw gateway, and a custom HTTP agent can be
+deployed together if their manifests declare distinct names, service names,
+ports, and secrets. Sessions, messages, runs, events, artifacts, health, and
+deployment records remain scoped to the selected workload. External agents are
+registered as `target: external` deployment records so health and UI state still
+show where the runtime lives even when MoiraWeave does not own the process.
+
+## Observability
+
+The API gateway exposes Prometheus metrics at `/metrics` on its HTTP service.
+The worker exposes a Prometheus metrics port named `metrics`. On Kubernetes,
+`make helm-monitoring-install` installs the monitoring chart and applies the
+MoiraWeave ServiceMonitor, PodMonitor, PrometheusRule, and Grafana dashboard
+ConfigMaps from `infra/k8s/monitoring/`.
+
+The monitoring stack is intentionally separate from workload placement. Managed
+agent/model workloads may expose their own metrics endpoints later, but the
+core control-plane metrics are deployed with the platform monitoring install.
+
 ## Design Decisions
 
 - Use one `workload.yaml` model for Compose, Kubernetes, API validation, and worker dispatch.
