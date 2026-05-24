@@ -14,7 +14,9 @@ or agent internals.
 
 ## Runtime Services
 
-- API gateway: auth, workload registration, run submission, sessions, messages, events, artifacts, and health.
+- API gateway: auth, workload templates, workload registration, preflight,
+  deployment operations, run submission, sessions, messages, events, artifacts,
+  and health.
 - Worker: consumes Redis dispatch messages and calls model, pipeline, or agent executors.
 - Postgres: source of truth for workloads, runs, sessions, messages, events, and artifact metadata.
 - Redis Streams: queue and short-lived coordination layer.
@@ -65,15 +67,16 @@ core control-plane metrics are deployed with the platform monitoring install.
 
 ## UI And CLI Boundary
 
-The Ops dashboard covers API-level operations: workload manifest registration,
-run submission, run cancellation, live events, artifacts, agent sessions,
-agent messages, channel simulation, deployment planning, deployment records,
-and health.
+The Ops dashboard covers API-level operations: guided workload creation,
+advanced manifest registration, run submission, run cancellation, live events,
+artifact browsing, agent sessions, agent messages, channel simulation,
+preflight, deployment planning, deployment record sync, and health.
 
 The API can return a deployment plan for each workload and target, including
 generated files, service endpoint, and the CLI/Helm commands needed to apply it.
-The CLI is still required for workspace-local actions that need filesystem,
-Docker, Helm, or Kubernetes credentials: `moira init`, Compose/Helm generation,
+It can also run preflight checks and record deployment operations. The CLI is
+still required for workspace-local actions that need filesystem, Docker, Helm,
+or Kubernetes credentials: `moira init`, `moira up`, Compose/Helm generation,
 `deploy local --up`, `deploy k8s --apply`, logs, and undeploy-style operations.
 The UI deliberately talks only to the API gateway and does not get direct access
 to Redis, Docker, Kubernetes, or local files.

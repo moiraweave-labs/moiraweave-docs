@@ -1,6 +1,7 @@
 # Quickstart
 
-This guide gets you from an empty workspace to a local agent workload.
+This guide gets you from an empty directory to a local MoiraWeave stack with a
+working demo agent, dashboard, runs, events, and artifacts.
 
 ## Prerequisites
 
@@ -8,14 +9,14 @@ This guide gets you from an empty workspace to a local agent workload.
 - `uv`
 - Docker and Docker Compose
 
-## 1. Install the CLI
+## 1. Install The CLI
 
 ```bash
 uv tool install moiraweave-cli
 moira --help
 ```
 
-## 2. Create a Workspace
+## 2. Create A Workspace
 
 ```bash
 mkdir my-moiraweave-workspace
@@ -35,97 +36,89 @@ moiraweave.yaml
 docker-compose.yml
 ```
 
-The generated Compose stack includes the Ops dashboard. By default it is served
-at `http://localhost:3000` and proxies API calls to the gateway service inside
-the Compose network.
+The generated Compose stack includes API Gateway, worker, Postgres, Redis,
+Qdrant, and the Ops dashboard.
 
-## 3. Create an Agent Workload
+## 3. Add A Demo Agent
+
+```bash
+moira demo agent
+```
+
+This writes `.moiraweave/workloads/demo-agent/workload.yaml`. It uses a local
+mock HTTP agent, so the first run needs no OpenAI key, Hermes runtime, or
+OpenClaw runtime.
+
+## 4. Start Everything
+
+```bash
+moira up
+```
+
+`moira up` initializes the workspace if needed, generates local workload Compose
+services, starts the platform and workloads, waits for API readiness, and
+registers workload/deployment records.
+
+Open `http://localhost:3000`, then sign in with:
+
+```text
+admin / demo-password
+```
+
+## 5. Use The Product Flow
+
+In the dashboard:
+
+- Workloads: create workloads from templates or inspect registered manifests.
+- Operations: run preflight, view deployment plans, and sync deployment records.
+- Agents: create a session, send a message, and follow the linked run status.
+- Runs: inspect event timelines, payloads, results, cancellation, and artifacts.
+- Artifacts: browse by workload, session, run, and content type.
+
+The simple product loop is:
+
+```text
+create workload -> deploy/connect runtime -> interact -> observe -> correct
+```
+
+## Hermes And OpenClaw
+
+For real agent runtimes, create them from the UI templates or CLI manifests:
 
 ```bash
 moira workload new hermes \
   --type agent-service \
   --image ghcr.io/nousresearch/hermes-agent:latest \
-  --deployment-mode managed \
-  --deployment-target local \
-  --deployment-target kubernetes \
   --service-name hermes \
   --mode session \
   --timeout-seconds 172800 \
   --adapter hermes \
   --port 8642 \
-  --env API_SERVER_ENABLED=true \
-  --env API_SERVER_HOST=0.0.0.0 \
-  --env API_SERVER_PORT=8642 \
-  --env 'API_SERVER_KEY=${HERMES_API_SERVER_KEY}' \
   --secret OPENAI_API_KEY \
   --secret HERMES_API_SERVER_KEY \
   --auth-token-env HERMES_API_SERVER_KEY \
-  --model hermes-agent \
   --persistence \
-  --mount-path /data \
+  --mount-path /workspace \
   --workspace-mount /workspace
 ```
 
-This writes `.moiraweave/workloads/hermes/workload.yaml`.
+MoiraWeave deploys and supervises the runtime, but Hermes/OpenClaw keep their
+own reasoning loop, tools, memory, and runtime-specific configuration.
 
-## 4. Generate Local Deployment Assets
+## CLI Boundaries
 
-```bash
-moira deploy local
-```
-
-Set required secrets in `.env`, then start the platform and workload services:
-
-```bash
-docker compose -f docker-compose.yml -f .moiraweave/deploy/docker-compose.workloads.yml up -d
-```
-
-## 5. Register And Run
-
-```bash
-export MOIRA_TOKEN=<token>
-moira workload deploy hermes
-moira deploy local --register
-moira workload status hermes
-moira agent session create hermes
-moira agent session message hermes <session-id> "hello" --watch
-```
-
-`moira workload deploy` stores the workload manifest in the API.
-`moira deploy local --register` stores the local deployment record and endpoint
-used by health checks and the dashboard. The API also stores the session, user
-message, queued run, worker events, assistant message, and any artifact
-metadata.
-
-Managed local workloads are attached to the same Compose network as the worker,
-so the Hermes runtime is reachable as `http://hermes:8642`. For an already
-running external runtime, create the workload with `--deployment-mode external`
-and `--endpoint <runtime-url>` instead of `--image`.
-
-## 6. Use The Dashboard
-
-Open `http://localhost:3000` and inspect:
-
-- Workloads
-- Runs and run timeline
-- Agent sessions and chat
-- Artifacts
-- Deployment health
-
-To test the channel gateway shape without a real Telegram or Slack bot:
-
-```bash
-moira agent channel-message hermes telegram user-123 "hello from telegram"
-```
-
-This creates or reuses a MoiraWeave agent session, records channel audit
-metadata, queues a run, and keeps the interaction visible in the dashboard.
+The UI never talks directly to Docker, Kubernetes, Redis, or the filesystem.
+Local execution runs through `moira up`, `moira deploy local`, and Docker
+Compose. Kubernetes execution should run through CLI, CI, or a deployment
+controller/operator.
 
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
 | `moira` command not found | CLI is not installed in the active shell | Re-run `uv tool install moiraweave-cli` |
-| Workload is registered but not reachable | Compose or Kubernetes workload service is not deployed | Run `moira deploy local` or inspect workload logs |
-| Agent message stays queued | Worker is not running or Redis is unavailable | Check `/ready`, worker logs, and Redis connectivity |
-| Agent run fails after dispatch timeout | Runtime did not acknowledge quickly | Configure the adapter path or make the agent return an ack before long work |
+| `moira up` cannot start containers | Docker is stopped or the port is busy | Start Docker and check ports 8000/3000/5432/6379 |
+| Login fails | Local demo password was overridden | Check `DEMO_USERNAME` and `DEMO_PASSWORD` in `.env` |
+| Workload is created but not healthy | Runtime service is missing or not reachable | Use Operations preflight and workload logs |
+| Agent message stays queued | Worker or Redis is unavailable | Check `/ready`, worker logs, and Redis connectivity |
+| Agent run fails after dispatch timeout | Runtime did not acknowledge quickly | Configure adapter paths or return an early ack before long work |
