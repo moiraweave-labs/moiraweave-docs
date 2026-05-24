@@ -37,9 +37,16 @@ the agent runtime, then MoiraWeave tracks the run through stored state and
 events. Hermes, OpenClaw, LangGraph, or custom agents keep their own internal
 reasoning loop.
 
+Agent runtimes can be placed in two ways. Managed runtimes are deployed by
+MoiraWeave as Docker Compose services or Kubernetes Deployments in the same
+network/namespace as the worker. External runtimes are not deployed by
+MoiraWeave; the manifest records `spec.endpoint`, and the adapter uses that
+URL.
+
 ## Design Decisions
 
 - Use one `workload.yaml` model for Compose, Kubernetes, API validation, and worker dispatch.
+- Use stable workload service names so local and Kubernetes deployments resolve the same way.
 - Keep Postgres as the durable control plane.
 - Keep Redis out of durable state.
 - Keep UI/API as the canonical interaction surface.

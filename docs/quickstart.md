@@ -45,6 +45,10 @@ the Compose network.
 moira workload new hermes \
   --type agent-service \
   --image ghcr.io/nousresearch/hermes-agent:latest \
+  --deployment-mode managed \
+  --deployment-target local \
+  --deployment-target kubernetes \
+  --service-name hermes \
   --mode session \
   --timeout-seconds 172800 \
   --adapter hermes \
@@ -88,6 +92,11 @@ moira agent session message hermes <session-id> "hello" --watch
 
 The API stores the session, user message, queued run, worker events, assistant
 message, and any artifact metadata.
+
+Managed local workloads are attached to the same Compose network as the worker,
+so the Hermes runtime is reachable as `http://hermes:8642`. For an already
+running external runtime, create the workload with `--deployment-mode external`
+and `--endpoint <runtime-url>` instead of `--image`.
 
 ## 6. Use The Dashboard
 

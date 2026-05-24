@@ -20,6 +20,23 @@ MoiraWeave should not import runtime internals, patch agent memory, or call tool
 implementations directly. That keeps upgrades and agent-specific configuration
 inside the runtime.
 
+## Deployment Placement
+
+Agent workloads have two placement modes:
+
+- `deployment.mode: managed`: MoiraWeave deploys the runtime next to the
+  control plane. In Docker Compose the service joins `moiraweave-net`. In
+  Kubernetes the Helm chart creates an in-namespace Deployment, Service, and PVC
+  when requested.
+- `deployment.mode: external`: MoiraWeave does not deploy the runtime. The
+  manifest must set `spec.endpoint`; the worker talks to that endpoint through
+  the selected adapter.
+
+Managed workloads use a stable service name. By default it is
+`metadata.name`, so the same manifest resolves as `http://hermes:8642` in
+Compose and Kubernetes. Set `deployment.serviceName` only when the runtime must
+use a different DNS name.
+
 ## Hermes Agent
 
 Hermes is the cleanest runtime to integrate because its API server exposes the
@@ -43,6 +60,11 @@ metadata:
 spec:
   type: agent-service
   image: ghcr.io/nousresearch/hermes-agent:latest
+  deployment:
+    mode: managed
+    targets: [local, kubernetes]
+    serviceName: hermes
+    replicas: 1
   execution:
     mode: session
     timeoutSeconds: 172800
@@ -104,6 +126,11 @@ metadata:
 spec:
   type: agent-service
   image: ghcr.io/openclaw/openclaw:latest
+  deployment:
+    mode: managed
+    targets: [local, kubernetes]
+    serviceName: openclaw
+    replicas: 1
   execution:
     mode: session
     timeoutSeconds: 172800
@@ -130,6 +157,18 @@ spec:
 MoiraWeave session ids become OpenClaw session keys in the form
 `agent:{agentId}:{session_id}` unless the payload already provides a
 runtime-native `session_key`.
+
+External OpenClaw or Hermes runtimes should use the same `agent` block but set:
+
+```yaml
+spec:
+  type: agent-service
+  endpoint: https://agents.example.com/hermes
+  deployment:
+    mode: external
+  agent:
+    adapter: hermes
+```
 
 ## Long-Running Behavior
 
