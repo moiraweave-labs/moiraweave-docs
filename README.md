@@ -4,7 +4,8 @@
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-live-blue)](https://moiraweave-labs.github.io/moiraweave-docs/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Public documentation site for the MoiraWeave platform.
+Public documentation site for MoiraWeave, the self-hosted AI workload and agent
+operations platform.
 
 ## What this repository contains
 
@@ -43,5 +44,5 @@ Please follow the organization contribution policy in:
 ## Related repositories
 
 - [moiraweave-cli](https://github.com/moiraweave-labs/moiraweave-cli)
-- [moiraweave-core](https://github.com/moiraweave-labs/moiraweave-core)
+- [moiraweave](https://github.com/moiraweave-labs/moiraweave)
 - [moiraweave-steps](https://github.com/moiraweave-labs/moiraweave-steps)
