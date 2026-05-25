@@ -45,4 +45,3 @@ Please follow the organization contribution policy in:
 
 - [moiraweave-cli](https://github.com/moiraweave-labs/moiraweave-cli)
 - [moiraweave](https://github.com/moiraweave-labs/moiraweave)
-- [moiraweave-steps](https://github.com/moiraweave-labs/moiraweave-steps)
