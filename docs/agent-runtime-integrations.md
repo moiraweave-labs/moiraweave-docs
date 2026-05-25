@@ -46,16 +46,21 @@ records.
 
 ## Channel Ownership
 
-Every inbound channel must be declared in the workload manifest before
-MoiraWeave accepts messages for it. The API gateway normalizes channel names to
-lowercase and only accepts `/v1/channels/{channel}/agents/{name}/messages` when
-`channel` is listed in `spec.agent.exposedChannels`.
+Every MoiraWeave-owned inbound channel must be declared in the workload
+manifest before MoiraWeave accepts messages for it. The API gateway normalizes
+channel names to lowercase and only accepts
+`/v1/channels/{channel}/agents/{name}/messages` when `channel` is listed in
+`spec.agent.exposedChannels`.
 
 Use `externalOwnedChannels` for integrations that the runtime owns itself. For
 example, if a Hermes profile already runs its own Telegram bridge, declare
 `externalOwnedChannels: [telegram]`; MoiraWeave will show that ownership in the
 manifest/health context, but it will reject MoiraWeave-owned inbound messages
-for that channel so traffic does not split across two controllers.
+for that channel so traffic does not split across two controllers. In that
+mode, users talk directly through Telegram and MoiraWeave remains the
+deployment, health, runs, events, cancellation, and artifact plane. Telegram
+messages are not mirrored into the MoiraWeave chat UI unless a dedicated
+connector/audit bridge is added later.
 
 ## Hermes Agent
 
@@ -107,7 +112,8 @@ spec:
     authTokenEnv: HERMES_API_SERVER_KEY
     model: hermes-agent
     workspaceMount: /workspace
-    exposedChannels: [ui, api, telegram]
+    exposedChannels: [ui, api]
+    externalOwnedChannels: [telegram]
     dispatchTimeoutSeconds: 10
     pollIntervalSeconds: 2
 ```

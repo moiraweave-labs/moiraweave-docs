@@ -23,7 +23,7 @@ control plane for model services, pipelines, and agent runtimes.
 - Runtime boundary: MoiraWeave operates agents but does not own their reasoning loop, memory, tools, or provider calls.
 - Durable control plane: Postgres stores workloads, runs, sessions, messages, events, and artifact metadata.
 - Redis as queue only: Redis is used for dispatch and short-lived worker coordination.
-- UI/API canonical channel: Telegram, Slack, Discord, and webhooks should enter through MoiraWeave connectors.
+- UI/API canonical channel: MoiraWeave owns dashboard/API sessions; Telegram, Slack, Discord, and webhooks can stay runtime-owned and supervised when duplicating them in the UI is not worth the product complexity.
 
 ## Agent Boundary
 

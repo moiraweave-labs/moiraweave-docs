@@ -69,7 +69,7 @@ core control-plane metrics are deployed with the platform monitoring install.
 
 The Ops dashboard covers API-level operations: guided workload creation,
 advanced manifest registration, run submission, run cancellation, live events,
-artifact browsing, agent sessions, agent messages, channel simulation,
+artifact browsing, agent sessions, agent messages, channel ownership,
 preflight, deployment planning, deployment record sync, and health.
 
 The API can return a deployment plan for each workload and target, including
@@ -87,8 +87,8 @@ to Redis, Docker, Kubernetes, or local files.
 - Use stable workload service names so local and Kubernetes deployments resolve the same way.
 - Keep Postgres as the durable control plane.
 - Keep Redis out of durable state.
-- Keep UI/API as the canonical interaction surface.
-- Model Telegram, Slack, Discord, and webhooks as connectors into MoiraWeave, not direct agent access.
+- Keep UI/API as the canonical MoiraWeave interaction surface.
+- Treat Telegram, Slack, Discord, and webhooks as runtime-owned channels unless a project explicitly builds a MoiraWeave connector.
 
 ## Further Reading
 

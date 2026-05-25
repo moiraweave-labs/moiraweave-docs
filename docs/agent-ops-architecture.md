@@ -26,7 +26,8 @@ flowchart TD
   User -->|Uses UI, CLI, and API| Moira
   Moira -->|Deploys, messages, cancels, collects artifacts| Agent
   Moira -->|Submits sync or async runs| Model
-  Channel -->|Inbound messages via connectors| Moira
+  Channel -->|Runtime-owned channel| Agent
+  Channel -. Optional connector .-> Moira
 
   style External fill:#0b1220,stroke:#334155,stroke-width:1.5px,color:#f8fafc;
 ```
@@ -44,7 +45,7 @@ flowchart LR
 
   UI[Ops Dashboard]:::primary --> API[API Gateway]
   CLI[moira CLI]:::default --> API
-  CH[Channel Connectors]:::default --> API
+  CH[Optional Channel Connectors]:::default --> API
   API --> PG[(Postgres)]:::database
   API --> REDIS[(Redis Streams)]:::queue
   Worker[Worker Fleet]:::default --> REDIS
@@ -103,7 +104,12 @@ sequenceDiagram
   API-->>UI: healthy, pending, degraded, or unknown
 ```
 
-## Channel Inbound Sequence
+## Optional Channel Connector Sequence
+
+Use this only when MoiraWeave owns the channel connector. If the runtime owns
+Telegram, Slack, Discord, or a webhook directly, declare it in
+`externalOwnedChannels` and let users interact through that runtime-owned
+channel.
 
 ```mermaid
 sequenceDiagram
@@ -130,9 +136,9 @@ MoiraWeave owns:
 - workload deployment metadata
 - deployment health derived from control-plane state
 - sessions, messages, runs, events, artifacts, and health
-- channel audit records for UI/API/Telegram/Slack/Discord/Webhook ingress
+- channel audit records for UI/API and MoiraWeave-owned connector ingress
 - cancellation and stale-run detection
-- UI/API/CLI/channel surfaces
+- UI/API/CLI surfaces
 - environment-specific deployment assets
 
 Agent runtimes own:
