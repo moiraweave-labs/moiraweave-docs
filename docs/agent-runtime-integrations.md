@@ -206,7 +206,8 @@ MoiraWeave.
 
 Agent turns can run for hours or days. The production pattern is:
 
-1. API stores the user message and creates a MoiraWeave run.
+1. API creates a MoiraWeave run and stores the user message with that exact
+   `run_id` so repeated prompts still map to distinct turns.
 2. Worker dispatches a short request to the runtime and records the external
    run id or session key.
 3. Worker emits MoiraWeave events while polling or streaming runtime progress.
