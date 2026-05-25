@@ -81,10 +81,13 @@ whether each required name is present from the API gateway point of view.
 
 The API can return a deployment plan for each workload and target, including
 generated files, service endpoint, and the CLI/Helm commands needed to apply it.
-It can also run preflight checks and record deployment operations. The CLI is
-still required for workspace-local actions that need filesystem, Docker, Helm,
-or Kubernetes credentials: `moira init`, `moira up`, Compose/Helm generation,
-`deploy local --up`, `deploy k8s --apply`, logs, and undeploy-style operations.
+It can also run preflight checks, surface recommended actions, and record
+deployment operations. Preflight now checks manifest validity, target support,
+deployment records, secret inventory, control-plane dependencies, and runtime
+reachability when a registered endpoint exists. The CLI is still required for
+workspace-local actions that need filesystem, Docker, Helm, or Kubernetes
+credentials: `moira init`, `moira up`, Compose/Helm generation, `deploy local
+--up`, `deploy k8s --apply`, logs, and undeploy-style operations.
 The UI deliberately talks only to the API gateway and does not get direct access
 to Redis, Docker, Kubernetes, or local files.
 

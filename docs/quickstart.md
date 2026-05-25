@@ -70,7 +70,8 @@ admin / demo-password
 In the dashboard:
 
 - Workloads: create workloads from templates or inspect registered manifests.
-- Operations: run preflight, view deployment plans, and sync deployment records.
+- Operations: run preflight, view recommended actions, inspect deployment
+  records, view deployment plans, and sync deployment records.
 - Agents: create a session, send a message, and follow the linked run status.
 - Runs: inspect event timelines, payloads, results, cancellation, and artifacts.
 - Artifacts: browse by workload, session, run, and content type.
