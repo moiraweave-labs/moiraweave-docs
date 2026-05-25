@@ -44,6 +44,19 @@ configuration. MoiraWeave sessions and runs are scoped by workload name, so two
 agents can run concurrently without sharing conversation ids or deployment
 records.
 
+## Channel Ownership
+
+Every inbound channel must be declared in the workload manifest before
+MoiraWeave accepts messages for it. The API gateway normalizes channel names to
+lowercase and only accepts `/v1/channels/{channel}/agents/{name}/messages` when
+`channel` is listed in `spec.agent.exposedChannels`.
+
+Use `externalOwnedChannels` for integrations that the runtime owns itself. For
+example, if a Hermes profile already runs its own Telegram bridge, declare
+`externalOwnedChannels: [telegram]`; MoiraWeave will show that ownership in the
+manifest/health context, but it will reject MoiraWeave-owned inbound messages
+for that channel so traffic does not split across two controllers.
+
 ## Hermes Agent
 
 Hermes is the cleanest runtime to integrate because its API server exposes the
