@@ -24,6 +24,9 @@ control plane for model services, pipelines, and agent runtimes.
 - Durable control plane: Postgres stores workloads, runs, sessions, messages, events, and artifact metadata.
 - Redis as queue only: Redis is used for dispatch and short-lived worker coordination.
 - UI/API canonical channel: MoiraWeave owns dashboard/API sessions; Telegram, Slack, Discord, and webhooks can stay runtime-owned and supervised when duplicating them in the UI is not worth the product complexity.
+- Secret names only: manifests declare required secret names, while values stay in
+  `.env`, Kubernetes Secrets, or an external secret manager. The API, CLI, and
+  UI show presence and missing names, never secret values.
 
 ## Agent Boundary
 
@@ -34,6 +37,7 @@ MoiraWeave owns:
 - run lifecycle and cancellation
 - health and stale-run detection
 - events, logs, and artifact metadata
+- required secret names and preflight status
 
 Agent runtimes own:
 

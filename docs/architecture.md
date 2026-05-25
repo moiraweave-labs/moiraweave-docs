@@ -16,7 +16,7 @@ or agent internals.
 
 - API gateway: auth, workload templates, workload registration, preflight,
   deployment operations, run submission, sessions, messages, events, artifacts,
-  and health.
+  secret inventory, and health.
 - Worker: consumes Redis dispatch messages and calls model, pipeline, or agent executors.
 - Postgres: source of truth for workloads, runs, sessions, messages, events, and artifact metadata.
 - Redis Streams: queue and short-lived coordination layer.
@@ -70,7 +70,14 @@ core control-plane metrics are deployed with the platform monitoring install.
 The Ops dashboard covers API-level operations: guided workload creation,
 advanced manifest registration, run submission, run cancellation, live events,
 artifact browsing, agent sessions, agent messages, channel ownership,
-preflight, deployment planning, deployment record sync, and health.
+preflight, deployment planning, secret inventory, deployment record sync, and
+health.
+
+Secret inventory is deliberately metadata-only. The API returns required names,
+presence, source, workload references, and remediation; it does not return
+values. Local values stay in `.env` or the process environment, Kubernetes
+values stay in Secrets or external secret managers, and the UI only displays
+whether each required name is present from the API gateway point of view.
 
 The API can return a deployment plan for each workload and target, including
 generated files, service endpoint, and the CLI/Helm commands needed to apply it.
