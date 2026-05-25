@@ -59,7 +59,7 @@ moira up
 services, starts the platform and workloads, waits for API readiness, and
 registers workload/deployment records.
 
-Open `http://localhost:3000`, then sign in with:
+Open `http://localhost:3000/agents`, then sign in with:
 
 ```text
 admin / demo-password
@@ -72,8 +72,9 @@ In the dashboard:
 - Workloads: create workloads from templates or inspect registered manifests.
 - Operations: run preflight, view recommended actions, inspect deployment
   records, view deployment plans, and sync deployment records.
-- Agents: create a session, send a message, cancel/retry a turn, and follow
-  the exact linked run status even when prompts repeat.
+- Agents: the first agent and existing session are selected automatically; create
+  a session, send a message, cancel/retry a turn, and follow the exact linked
+  run status even when prompts repeat.
 - Runs: inspect event timelines, payloads, results, cancellation, and artifacts.
 - Artifacts: browse by workload, session, run, and content type.
 
