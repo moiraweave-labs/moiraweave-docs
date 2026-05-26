@@ -79,7 +79,8 @@ In the dashboard:
   turn, and follow the exact linked run status even when prompts repeat.
 - Runs: inspect event timelines, payloads, results, cancellation, and artifacts.
 - Artifacts: browse by workload, session, run, and content type; inspect
-  metadata, follow run links, and copy artifact references.
+  metadata, preview/download local or PVC-backed files, follow run links, and
+  copy artifact references.
 
 The simple product loop is:
 

@@ -22,7 +22,8 @@ or agent internals.
 - Redis Streams: queue and short-lived coordination layer.
 - Qdrant: optional vector store for RAG/search workloads.
 - UI: browser console for workloads, runs, agent sessions, artifact metadata
-  inspection, deployment health, and deployment operation history.
+  inspection, local/PVC artifact preview and download, deployment health, and
+  deployment operation history.
 
 ## End-to-End Run Flow
 
@@ -70,9 +71,9 @@ core control-plane metrics are deployed with the platform monitoring install.
 
 The Ops dashboard covers API-level operations: guided workload creation,
 advanced manifest registration, run submission, run cancellation, live events,
-artifact browsing and metadata inspection, agent sessions, agent messages,
-channel ownership, preflight, deployment planning, secret inventory,
-deployment record sync, and health.
+artifact browsing, local/PVC artifact preview and download, metadata
+inspection, agent sessions, agent messages, channel ownership, preflight,
+deployment planning, secret inventory, deployment record sync, and health.
 
 Secret inventory is deliberately metadata-only. The API returns required names,
 presence, source, workload references, and remediation; it does not return
@@ -93,6 +94,11 @@ Kubernetes credentials: `moira init`, `moira up`, Compose/Helm generation,
 `deploy local --up`, `deploy k8s --apply`, logs, and undeploy-style operations.
 The UI deliberately talks only to the API gateway and does not get direct access
 to Redis, Docker, Kubernetes, or local files.
+
+Artifact content is served only when the artifact URI resolves inside the API
+gateway artifact storage root. Local Compose uses the configured
+`ARTIFACTS_DIR`; Kubernetes uses the mounted PVC path. Remote runtime-owned
+artifact URIs remain metadata-only unless a storage connector is added.
 
 ## Design Decisions
 
