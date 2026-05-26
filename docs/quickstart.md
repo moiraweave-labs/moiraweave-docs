@@ -65,6 +65,10 @@ Open `http://localhost:3000/agents`, then sign in with:
 admin / demo-password
 ```
 
+The local demo user has the `admin` role by default. For automation, set
+`MOIRA_API_KEYS` with comma-separated `key:subject:role` entries and use the key
+as a bearer token.
+
 ## 5. Use The Product Flow
 
 In the dashboard:
@@ -133,6 +137,7 @@ controller/operator.
 | `moira up` cannot start containers | Docker is stopped or the port is busy | Start Docker and check ports 8000/3000/5432/6379 |
 | `moira up` reports missing environment variables | Required workload secrets are not available locally | Run `moira secrets list`, then add the missing names to `.env` or export them |
 | Login fails | Local demo password was overridden | Check `DEMO_USERNAME` and `DEMO_PASSWORD` in `.env` |
+| API request returns `403` | The token role is too limited | Use an `operator` or `admin` token for mutating actions |
 | Workload is created but not healthy | Runtime service is missing or not reachable | Use Operations preflight and workload logs |
 | Agent message stays queued | Worker or Redis is unavailable | Check `/ready`, worker logs, and Redis connectivity |
 | Agent run fails after dispatch timeout | Runtime did not acknowledge quickly | Configure adapter paths or return an early ack before long work |

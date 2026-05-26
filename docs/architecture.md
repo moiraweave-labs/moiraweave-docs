@@ -75,6 +75,13 @@ artifact browsing, local/PVC artifact preview and download, metadata
 inspection, agent sessions, agent messages, channel ownership, preflight,
 deployment planning, secret inventory, deployment record sync, and health.
 
+API access uses bearer credentials. Local development can issue demo JWTs with
+`DEMO_USERNAME`, `DEMO_PASSWORD`, and `DEMO_ROLE`. Automation can use API keys
+defined as comma-separated `key:subject:role` entries in `MOIRA_API_KEYS`. The
+initial role model is intentionally small: `viewer` can inspect, `operator` can
+run, cancel, message agents, preflight, and record deployment operations, and
+`admin` can create workloads and inspect secret inventory.
+
 Secret inventory is deliberately metadata-only. The API returns required names,
 presence, source, workload references, and remediation; it does not return
 values. Local values stay in `.env` or the process environment, Kubernetes
