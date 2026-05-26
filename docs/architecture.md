@@ -21,8 +21,8 @@ or agent internals.
 - Postgres: source of truth for workloads, runs, sessions, messages, events, and artifact metadata.
 - Redis Streams: queue and short-lived coordination layer.
 - Qdrant: optional vector store for RAG/search workloads.
-- UI: browser console for workloads, runs, agent sessions, artifacts,
-  deployment health, and deployment operation history.
+- UI: browser console for workloads, runs, agent sessions, artifact metadata
+  inspection, deployment health, and deployment operation history.
 
 ## End-to-End Run Flow
 
@@ -70,9 +70,9 @@ core control-plane metrics are deployed with the platform monitoring install.
 
 The Ops dashboard covers API-level operations: guided workload creation,
 advanced manifest registration, run submission, run cancellation, live events,
-artifact browsing, agent sessions, agent messages, channel ownership,
-preflight, deployment planning, secret inventory, deployment record sync, and
-health.
+artifact browsing and metadata inspection, agent sessions, agent messages,
+channel ownership, preflight, deployment planning, secret inventory,
+deployment record sync, and health.
 
 Secret inventory is deliberately metadata-only. The API returns required names,
 presence, source, workload references, and remediation; it does not return
