@@ -67,7 +67,9 @@ admin / demo-password
 
 The local demo user has the `admin` role by default. For automation, set
 `MOIRA_API_KEYS` with comma-separated `key:subject:role` entries and use the key
-as a bearer token.
+as a bearer token. The dashboard resolves the active credential with
+`GET /auth/me`, shows the current role in the header, and disables actions that
+need a higher role before they fail server-side.
 
 ## 5. Use The Product Flow
 
