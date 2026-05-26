@@ -71,7 +71,8 @@ In the dashboard:
 
 - Workloads: create workloads from templates or inspect registered manifests.
 - Operations: run preflight, view recommended actions, inspect deployment
-  records, view deployment plans, and sync deployment records.
+  records, view deployment plans, sync deployment records, and review
+  deployment operation history.
 - Agents: the first agent and existing session are selected automatically; create
   a session, send a message, cancel/retry a turn, and follow the exact linked
   run status even when prompts repeat.

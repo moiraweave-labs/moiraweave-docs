@@ -21,7 +21,8 @@ or agent internals.
 - Postgres: source of truth for workloads, runs, sessions, messages, events, and artifact metadata.
 - Redis Streams: queue and short-lived coordination layer.
 - Qdrant: optional vector store for RAG/search workloads.
-- UI: browser console for workloads, runs, agent sessions, artifacts, and deployment health.
+- UI: browser console for workloads, runs, agent sessions, artifacts,
+  deployment health, and deployment operation history.
 
 ## End-to-End Run Flow
 
@@ -84,10 +85,12 @@ generated files, service endpoint, and the CLI/Helm commands needed to apply it.
 It can also run preflight checks, surface recommended actions, and record
 deployment operations. Preflight now checks manifest validity, target support,
 deployment records, secret inventory, control-plane dependencies, and runtime
-reachability when a registered endpoint exists. The CLI is still required for
-workspace-local actions that need filesystem, Docker, Helm, or Kubernetes
-credentials: `moira init`, `moira up`, Compose/Helm generation, `deploy local
---up`, `deploy k8s --apply`, logs, and undeploy-style operations.
+reachability when a registered endpoint exists. Deployment operations are
+stored as a navigable history so operators can inspect plans, syncs, blocked
+applies, events, timestamps, and outcomes after the fact. The CLI is still
+required for workspace-local actions that need filesystem, Docker, Helm, or
+Kubernetes credentials: `moira init`, `moira up`, Compose/Helm generation,
+`deploy local --up`, `deploy k8s --apply`, logs, and undeploy-style operations.
 The UI deliberately talks only to the API gateway and does not get direct access
 to Redis, Docker, Kubernetes, or local files.
 
