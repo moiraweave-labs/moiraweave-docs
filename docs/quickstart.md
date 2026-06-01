@@ -16,15 +16,20 @@ uv tool install moiraweave-cli
 moira --help
 ```
 
-## 2. Create A Workspace
+## 2. Start The Local Product
 
 ```bash
 mkdir my-moiraweave-workspace
 cd my-moiraweave-workspace
-moira init --non-interactive
+moira up
 ```
 
-The workspace contains:
+`moira up` initializes the workspace if needed, creates a no-secret demo agent
+when there are no workloads, generates local workload Compose services, runs
+`moira doctor`, starts the platform and workloads, waits for API readiness, and
+registers workload/deployment records.
+
+The generated workspace contains:
 
 ```text
 .moiraweave/
@@ -38,26 +43,6 @@ docker-compose.yml
 
 The generated Compose stack includes API Gateway, worker, Postgres, Redis,
 Qdrant, and the Ops dashboard.
-
-## 3. Add A Demo Agent
-
-```bash
-moira demo agent
-```
-
-This writes `.moiraweave/workloads/demo-agent/workload.yaml`. It uses a local
-mock HTTP agent, so the first run needs no OpenAI key, Hermes runtime, or
-OpenClaw runtime.
-
-## 4. Start Everything
-
-```bash
-moira up
-```
-
-`moira up` initializes the workspace if needed, generates local workload Compose
-services, starts the platform and workloads, waits for API readiness, and
-registers workload/deployment records.
 
 Open `http://localhost:3000/agents`, then sign in with:
 
@@ -78,7 +63,20 @@ needed, sends the message, and watches the associated run:
 moira agent chat demo-agent "hello from the CLI" --watch
 ```
 
-## 5. Use The Product Flow
+If the local stack does not start cleanly, run:
+
+```bash
+moira doctor
+```
+
+For automation, use `moira doctor --json`.
+
+If you run development builds or private registries, override platform images in
+`.env` with `MOIRAWEAVE_API_GATEWAY_IMAGE`, `MOIRAWEAVE_WORKER_IMAGE`, and
+`MOIRAWEAVE_UI_IMAGE`. `moira doctor` checks whether required images are locally
+available or pullable before Docker starts.
+
+## 3. Use The Product Flow
 
 In the dashboard:
 
@@ -103,7 +101,9 @@ create workload -> deploy/connect runtime -> interact -> observe -> correct
 
 ## Hermes And OpenClaw
 
-For real agent runtimes, create them from the UI templates or CLI manifests:
+For real agent runtimes, create them from the UI templates or CLI manifests.
+`moira init` and `moira demo agent` remain available when you want explicit
+setup steps, but they are not required for the first local demo.
 
 ```bash
 moira workload new hermes \
@@ -143,8 +143,10 @@ controller/operator.
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
 | `moira` command not found | CLI is not installed in the active shell | Re-run `uv tool install moiraweave-cli` |
-| `moira up` cannot start containers | Docker is stopped or the port is busy | Start Docker and check ports 8000/3000/5432/6379 |
-| `moira up` reports missing environment variables | Required workload secrets are not available locally | Run `moira secrets list`, then add the missing names to `.env` or export them |
+| `moira up` stops before Docker starts | `moira doctor` found a blocking local issue | Fix the ERROR rows from `moira doctor`, then rerun `moira up` |
+| `moira up` cannot start containers | Docker is stopped or the port is busy | Run `moira doctor`, start Docker, and check ports 8000/3000/5432/6379 |
+| `moira doctor` reports container images unavailable | The image is private, unpublished, or the registry login is missing | Publish/login to the registry or override `MOIRAWEAVE_*_IMAGE` in `.env` |
+| `moira up` reports missing environment variables | Required workload secrets are not available locally | Run `moira doctor` or `moira secrets list`, then add missing names to `.env` or export them |
 | Login fails | Local demo password was overridden | Check `DEMO_USERNAME` and `DEMO_PASSWORD` in `.env` |
 | API request returns `403` | The token role is too limited | Use an `operator` or `admin` token for mutating actions |
 | Workload is created but not healthy | Runtime service is missing or not reachable | Use Operations preflight and workload logs |
