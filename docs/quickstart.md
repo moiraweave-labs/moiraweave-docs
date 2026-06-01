@@ -76,6 +76,10 @@ If you run development builds or private registries, override platform images in
 `MOIRAWEAVE_UI_IMAGE`. `moira doctor` checks whether required images are locally
 available or pullable before Docker starts.
 
+Official images are built and pushed by GitHub Actions. GHCR package visibility
+is a separate setting: the packages must be public for anonymous `docker pull`
+and first-run `moira up` to work without a registry login.
+
 ## 3. Use The Product Flow
 
 In the dashboard:
@@ -145,7 +149,8 @@ controller/operator.
 | `moira` command not found | CLI is not installed in the active shell | Re-run `uv tool install moiraweave-cli` |
 | `moira up` stops before Docker starts | `moira doctor` found a blocking local issue | Fix the ERROR rows from `moira doctor`, then rerun `moira up` |
 | `moira up` cannot start containers | Docker is stopped or the port is busy | Run `moira doctor`, start Docker, and check ports 8000/3000/5432/6379 |
-| `moira doctor` reports container images unavailable | The image is private, unpublished, or the registry login is missing | Publish/login to the registry or override `MOIRAWEAVE_*_IMAGE` in `.env` |
+| `moira doctor` reports official images unavailable | GHCR images were pushed but package visibility is not public | In GitHub Packages, set `moiraweave/api-gateway`, `moiraweave/worker`, and `moiraweave-ui` to public, then rerun `moira doctor` |
+| `moira doctor` reports custom images unavailable | The image is private, unpublished, or the registry login is missing | Publish/login to the registry or override `MOIRAWEAVE_*_IMAGE` in `.env` |
 | `moira up` reports missing environment variables | Required workload secrets are not available locally | Run `moira doctor` or `moira secrets list`, then add missing names to `.env` or export them |
 | Login fails | Local demo password was overridden | Check `DEMO_USERNAME` and `DEMO_PASSWORD` in `.env` |
 | API request returns `403` | The token role is too limited | Use an `operator` or `admin` token for mutating actions |
