@@ -39,6 +39,9 @@ stay generic and should not carry customer-specific agents, models, or secrets.
 
 This repository owns the browser-based operations experience. It talks only to
 the API gateway and does not access Redis, Kubernetes, or Postgres directly.
+Keep route screens, shared components, hooks, and typed utilities in separate
+modules; `App.tsx` should own shell and routing composition rather than feature
+implementations.
 
 ### `moiraweave-docs`
 
