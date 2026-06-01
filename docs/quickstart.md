@@ -71,6 +71,13 @@ as a bearer token. The dashboard resolves the active credential with
 `GET /auth/me`, shows the current role in the header, and disables actions that
 need a higher role before they fail server-side.
 
+For a terminal-only smoke test, use one command that creates a session when
+needed, sends the message, and watches the associated run:
+
+```bash
+moira agent chat demo-agent "hello from the CLI" --watch
+```
+
 ## 5. Use The Product Flow
 
 In the dashboard:
