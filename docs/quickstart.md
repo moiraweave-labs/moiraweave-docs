@@ -88,7 +88,9 @@ In the dashboard:
   or the agent console.
 - Operations: run preflight, view recommended actions, inspect deployment
   records, view deployment plans, sync deployment records, and review
-  deployment operation history.
+  deployment operation history. Preflight separates Postgres, Redis, worker
+  dispatch, deployment records, secrets, and runtime reachability so queued
+  agent turns have an actionable cause.
 - Agents: the first agent and existing session are selected automatically; start
   the first session from the empty-state CTA, send a message, cancel/retry a
   turn, and follow the exact linked run status even when prompts repeat.
@@ -155,5 +157,5 @@ controller/operator.
 | Login fails | Local demo password was overridden | Check `DEMO_USERNAME` and `DEMO_PASSWORD` in `.env` |
 | API request returns `403` | The token role is too limited | Use an `operator` or `admin` token for mutating actions |
 | Workload is created but not healthy | Runtime service is missing or not reachable | Use Operations preflight and workload logs |
-| Agent message stays queued | Worker or Redis is unavailable | Check `/ready`, worker logs, and Redis connectivity |
+| Agent message stays queued | Worker is stopped, Redis is unavailable, or no worker consumer is attached | Run Operations preflight and check `worker_dispatch`, `/ready`, worker logs, and Redis connectivity |
 | Agent run fails after dispatch timeout | Runtime did not acknowledge quickly | Configure adapter paths or return an early ack before long work |
