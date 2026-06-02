@@ -105,7 +105,8 @@ deployment operations. Preflight now checks manifest validity, target support,
 deployment records, secret inventory, control-plane dependencies, and runtime
 reachability when a registered endpoint exists. Deployment operations are
 stored as a navigable history so operators can inspect plans, syncs, blocked
-applies, events, timestamps, and outcomes after the fact. The CLI is still
+applies/undeploys, generated commands, next actions, events, timestamps, and
+outcomes after the fact. The CLI is still
 required for workspace-local actions that need filesystem, Docker, Helm, or
 Kubernetes credentials: `moira init`, `moira up`, Compose/Helm generation,
 `deploy local --up`, `deploy k8s --apply`, logs, and undeploy-style operations.
