@@ -34,6 +34,11 @@ or agent internals.
 5. The worker stores events, assistant messages, artifacts, result, and final state.
 6. UI and CLI read from the API only.
 
+For long-running agents, Postgres is the durable source of truth. Workers update
+`heartbeat_at`, stale active runs become `lost`, and Redis pending entries are
+only reclaimed when the run state says it is safe. This prevents an idle Redis
+pending message from duplicating an agent turn that is still heartbeating.
+
 ## Agent Flow
 
 Agent workloads use an adapter. The adapter sends a short-lived dispatch call to
@@ -66,6 +71,9 @@ ConfigMaps from `infra/k8s/monitoring/`.
 The monitoring stack is intentionally separate from workload placement. Managed
 agent/model workloads may expose their own metrics endpoints later, but the
 core control-plane metrics are deployed with the platform monitoring install.
+The API `/ready` response also reports `run_queue` state, including the Redis
+stream, worker consumer group, attached consumers, pending count, and lag when
+available.
 
 ## UI And CLI Boundary
 

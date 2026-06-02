@@ -11,7 +11,8 @@ custom agent server.
 - Runs, sessions, user messages, assistant responses, events, and artifacts.
 - Local Compose and Kubernetes deployment assets.
 - UI/API/CLI interaction paths.
-- Cancellation requests, heartbeat, stale-run detection, and operational status.
+- Cancellation requests, heartbeat, stale-run detection, Redis pending-message
+  cleanup, and operational status.
 - Secret references, channel routing metadata, and audit records.
 
 ## The Agent Runtime Owns
@@ -35,6 +36,27 @@ MoiraWeave talks to agents through adapters. A good adapter exposes:
 For agents that run for hours or days, the adapter should acknowledge quickly and
 let MoiraWeave poll or stream events. Keeping a single HTTP request open for the
 whole reasoning loop is not the intended operating model.
+
+## Long-Running Recovery
+
+Long-running runs are tracked in Postgres, not Redis. The worker writes
+`heartbeat_at` while a run is active. If heartbeats stop, stale-run detection
+marks active runs as `lost` and appends a `run.lost` event.
+
+Redis Streams remain the dispatch queue. A healthy long-running run can keep its
+stream message pending until the run finishes, so MoiraWeave does not reclaim
+pending messages by idle time alone. Pending recovery first checks the durable
+run state:
+
+- `queued` and `cancel_requested` messages can be reclaimed by another worker.
+- Terminal messages are acknowledged and removed from the pending list.
+- `starting`, `running`, and `cancelling` messages are left alone while their
+  run is active, so an agent turn is not duplicated.
+
+The API `/ready` response includes `run_queue` metadata with the Redis stream,
+consumer group, attached consumers, pending count, and lag when Redis exposes
+it. Operators should treat `run_queue: degraded` as a worker/dispatch issue,
+not as an agent-runtime failure.
 
 ## Channels
 
