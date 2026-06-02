@@ -80,8 +80,9 @@ available.
 The Ops dashboard covers API-level operations: guided workload creation,
 advanced manifest registration, run submission, run cancellation, live events,
 artifact browsing, local/PVC artifact preview and download, metadata
-inspection, agent sessions, agent messages, channel ownership, preflight,
-deployment planning, secret inventory, deployment record sync, and health.
+inspection, cross-links from artifacts back to runs and agent sessions, agent
+session health, agent messages, channel ownership, preflight, deployment
+planning, secret inventory, deployment record sync, and health.
 
 API access uses bearer credentials. Local development can issue demo JWTs with
 `DEMO_USERNAME`, `DEMO_PASSWORD`, and `DEMO_ROLE`. Automation can use API keys

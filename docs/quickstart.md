@@ -93,11 +93,12 @@ In the dashboard:
   agent turns have an actionable cause.
 - Agents: the first agent and existing session are selected automatically; start
   the first session from the empty-state CTA, send a message, cancel/retry a
-  turn, and follow the exact linked run status even when prompts repeat.
+  turn, watch session health, and follow the exact linked run status even when
+  prompts repeat.
 - Runs: inspect event timelines, payloads, results, cancellation, and artifacts.
 - Artifacts: browse by workload, session, run, and content type; inspect
-  metadata, preview/download local or PVC-backed files, follow run links, and
-  copy artifact references.
+  metadata, preview/download local or PVC-backed files, follow run links, jump
+  back to the exact agent session when available, and copy artifact references.
 
 The simple product loop is:
 
