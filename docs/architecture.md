@@ -16,14 +16,15 @@ or agent internals.
 
 - API gateway: auth, workload templates, workload registration, preflight,
   deployment operations, run submission, sessions, messages, events, artifacts,
-  secret inventory, and health.
+  audit events, secret inventory, and health.
 - Worker: consumes Redis dispatch messages and calls model, pipeline, or agent executors.
-- Postgres: source of truth for workloads, runs, sessions, messages, events, and artifact metadata.
+- Postgres: source of truth for workloads, runs, sessions, messages, events,
+  artifact metadata, and audit events.
 - Redis Streams: queue and short-lived coordination layer.
 - Qdrant: optional vector store for RAG/search workloads.
 - UI: browser console for workloads, runs, agent sessions, artifact metadata
   inspection, local/PVC artifact preview and download, deployment health, and
-  deployment operation history.
+  deployment operation history, and audit trail inspection.
 
 ## End-to-End Run Flow
 
@@ -98,6 +99,14 @@ presence, source, workload references, and remediation; it does not return
 values. Local values stay in `.env` or the process environment, Kubernetes
 values stay in Secrets or external secret managers, and the UI only displays
 whether each required name is present from the API gateway point of view.
+
+Audit events are stored in Postgres and scoped to the authenticated subject.
+The current trail records deployment records, deployment operations, run
+cancellation, agent messages, channel ingress messages, artifact previews, and
+artifact downloads. These records are operational breadcrumbs for teams: who
+asked MoiraWeave to do something sensitive, against which resource, and with
+which non-secret metadata. They are available through `GET /v1/audit-events`;
+the UI can surface them without direct database access.
 
 The API can return a deployment plan for each workload and target, including
 generated files, service endpoint, and the CLI/Helm commands needed to apply it.

@@ -75,7 +75,7 @@ sequenceDiagram
 
   U->>UI: Send message
   UI->>API: POST /v1/agents/{name}/sessions/{id}/messages
-  API->>DB: Store user message and queued run
+  API->>DB: Store user message, queued run, and audit event
   API->>R: Dispatch run message
   W->>R: Consume run
   W->>DB: Mark starting/running, emit events
@@ -98,7 +98,7 @@ sequenceDiagram
   O->>CLI: moira deploy local or k8s
   CLI->>O: Generate/apply runtime manifests
   CLI->>API: POST /v1/workloads/{name}/deployments
-  API->>DB: Upsert deployment record
+  API->>DB: Upsert deployment record and audit event
   UI->>API: GET /v1/workloads/{name}/health
   API->>DB: Read deployment/run/session state
   API-->>UI: healthy, pending, degraded, or unknown
@@ -136,7 +136,8 @@ MoiraWeave owns:
 - workload deployment metadata
 - deployment health derived from control-plane state
 - sessions, messages, runs, events, artifacts, and health
-- channel audit records for UI/API and MoiraWeave-owned connector ingress
+- audit records for deployment operations, cancellation, artifact access, UI/API
+  agent messages, and MoiraWeave-owned connector ingress
 - cancellation and stale-run detection
 - UI/API/CLI surfaces
 - environment-specific deployment assets
@@ -173,3 +174,4 @@ Runtime-specific details live in
 - `GET /v1/workloads/{name}/health`: summarize health from deployment state and probe deployment endpoints when present.
 - `POST /v1/channels/{channel}/agents/{name}/messages`: authenticated inbound channel bridge.
 - `GET /v1/agents/{name}/sessions/{session_id}/health`: summarize a session and its latest run.
+- `GET /v1/audit-events`: list the authenticated subject's audit events, with filters for action and resource.

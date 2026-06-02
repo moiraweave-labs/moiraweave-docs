@@ -16,14 +16,16 @@ control plane for model services, pipelines, and agent runtimes.
 | Session | A conversation or durable interaction context for an agent workload | MoiraWeave control plane |
 | Event | Timeline entry emitted by API, worker, adapter, or runtime | MoiraWeave control plane |
 | Artifact | Metadata for files or outputs produced by a run | Workload produces, MoiraWeave indexes |
+| Audit event | Durable record of a sensitive platform action | MoiraWeave control plane |
 
 ## Design Principles
 
 - Workload first: `workload.yaml` is the shared contract for Compose, Kubernetes, API, CLI, worker, and UI.
 - Runtime boundary: MoiraWeave operates agents but does not own their reasoning loop, memory, tools, or provider calls.
-- Durable control plane: Postgres stores workloads, runs, sessions, messages, events, and artifact metadata.
+- Durable control plane: Postgres stores workloads, runs, sessions, messages, events, artifact metadata, and audit events.
 - Redis as queue only: Redis is used for dispatch and short-lived worker coordination.
 - UI/API canonical channel: MoiraWeave owns dashboard/API sessions; Telegram, Slack, Discord, and webhooks can stay runtime-owned and supervised when duplicating them in the UI is not worth the product complexity.
+- Audit actions, not secrets: deploy operations, run cancellation, agent/channel messages, and artifact access are traceable without storing secret values.
 - Secret names only: manifests declare required secret names, while values stay in
   `.env`, Kubernetes Secrets, or an external secret manager. The API, CLI, and
   UI show presence and missing names, never secret values.
@@ -37,6 +39,7 @@ MoiraWeave owns:
 - run lifecycle and cancellation
 - health and stale-run detection
 - events, logs, and artifact metadata
+- audit events for sensitive control-plane actions
 - required secret names and preflight status
 
 Agent runtimes own:
