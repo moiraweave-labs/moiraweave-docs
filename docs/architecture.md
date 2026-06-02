@@ -23,8 +23,8 @@ or agent internals.
 - Redis Streams: queue and short-lived coordination layer.
 - Qdrant: optional vector store for RAG/search workloads.
 - UI: browser console for workloads, runs, agent sessions, artifact metadata
-  inspection, local/PVC artifact preview and download, deployment health, and
-  deployment operation history, and audit trail inspection.
+  inspection, local/PVC artifact preview and download, environment-scoped
+  deployment health, deployment operation history, and audit trail inspection.
 
 ## End-to-End Run Flow
 
@@ -61,6 +61,20 @@ deployment records remain scoped to the selected workload. External agents are
 registered as `target: external` deployment records so health and UI state still
 show where the runtime lives even when MoiraWeave does not own the process.
 
+## Environments
+
+Deployment state is scoped by environment. A workload can have separate
+deployment records for `local`, `dev`, `staging`, and `prod`, even when the
+target is the same. This keeps a healthy local Compose service from masking a
+missing Kubernetes deployment, and it lets Operations Center filter preflight,
+health, deployment plans, deployment operations, and records to the environment
+an operator is currently working on.
+
+`moira up` and `moira deploy local` write `local` deployment records. Kubernetes
+commands and deployment operations use the selected CLI/UI environment, commonly
+`dev`, `staging`, or `prod`. Audit events include the environment as non-secret
+metadata when a deployment record or operation is created.
+
 ## Observability
 
 The API gateway exposes Prometheus metrics at `/metrics` on its HTTP service.
@@ -84,6 +98,9 @@ artifact browsing, local/PVC artifact preview and download, metadata
 inspection, cross-links from artifacts back to runs and agent sessions, agent
 session health, agent messages, channel ownership, preflight, deployment
 planning, secret inventory, deployment record sync, and health.
+Operations Center keeps the selected environment explicit so an operator can
+compare created, deployed, reachable, and healthy state without mixing local and
+cluster records.
 
 API access uses bearer credentials. Local development can issue demo JWTs with
 `DEMO_USERNAME`, `DEMO_PASSWORD`, and `DEMO_ROLE`. Automation can use API keys
@@ -111,12 +128,14 @@ the UI can surface them without direct database access.
 The API can return a deployment plan for each workload and target, including
 generated files, service endpoint, and the CLI/Helm commands needed to apply it.
 It can also run preflight checks, surface recommended actions, and record
-deployment operations. Preflight now checks manifest validity, target support,
-deployment records, secret inventory, control-plane dependencies, and runtime
-reachability when a registered endpoint exists. Deployment operations are
-stored as a navigable history so operators can inspect plans, syncs, blocked
-applies/undeploys, generated commands, next actions, events, timestamps, and
-outcomes after the fact. The CLI is still
+deployment operations. These APIs accept an environment filter so an operator can
+plan, sync, diagnose, and inspect one environment at a time. Preflight now checks
+manifest validity, target support, environment-scoped deployment records, secret
+inventory, control-plane dependencies, and runtime reachability when a
+registered endpoint exists. Deployment operations are stored as a navigable
+history so operators can inspect plans, syncs, blocked applies/undeploys,
+generated commands, next actions, events, timestamps, and outcomes after the
+fact. The CLI is still
 required for workspace-local actions that need filesystem, Docker, Helm, or
 Kubernetes credentials: `moira init`, `moira up`, Compose/Helm generation,
 `deploy local --up`, `deploy k8s --apply`, logs, and undeploy-style operations.

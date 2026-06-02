@@ -29,6 +29,11 @@ when there are no workloads, generates local workload Compose services, runs
 `moira doctor`, starts the platform and workloads, waits for API readiness, and
 registers workload/deployment records.
 
+Local records are stored under the `local` environment. When you later use
+Kubernetes or an external runtime, keep its records in `dev`, `staging`, `prod`,
+or another explicit environment so health and preflight stay easy to reason
+about.
+
 The generated workspace contains:
 
 ```text
@@ -88,9 +93,11 @@ In the dashboard:
   or the agent console.
 - Operations: run preflight, view recommended actions, inspect deployment
   records, view deployment plans, sync deployment records, and review
-  deployment operation history. Preflight separates Postgres, Redis, worker
-  dispatch, deployment records, secrets, and runtime reachability so queued
-  agent turns have an actionable cause.
+  deployment operation history. Select the environment first: `local` for
+  `moira up`, or `dev`/`staging`/`prod` for cluster and external runtimes.
+  Preflight separates Postgres, Redis, worker dispatch, environment-scoped
+  deployment records, secrets, and runtime reachability so queued agent turns
+  have an actionable cause.
 - Agents: the first agent and existing session are selected automatically; start
   the first session from the empty-state CTA, send a message, cancel/retry a
   turn, watch session health, and follow the exact linked run status even when
@@ -162,6 +169,7 @@ controller to execute; the browser does not receive deployment credentials.
 | Login fails | Local demo password was overridden | Check `DEMO_USERNAME` and `DEMO_PASSWORD` in `.env` |
 | API request returns `403` | The token role is too limited | Use an `operator` or `admin` token for mutating actions |
 | Workload is created but not healthy | Runtime service is missing or not reachable | Use Operations preflight and workload logs |
+| Production looks healthy because local is running | Operations is filtered to the wrong environment | Switch the environment selector to `prod` and rerun preflight |
 | A teammate changed/canceled/accessed something | Audit trail is needed | Query `/v1/audit-events` with `action`, `resource_type`, or `resource_id` filters |
 | `/ready` shows `run_queue: degraded` | Worker consumer group is missing or no worker is attached | Start/restart the worker and check Redis connectivity |
 | Agent message stays queued | Worker is stopped, Redis is unavailable, or no worker consumer is attached | Run Operations preflight and check `worker_dispatch`, `/ready`, worker logs, and Redis connectivity |

@@ -16,6 +16,7 @@ control plane for model services, pipelines, and agent runtimes.
 | Session | A conversation or durable interaction context for an agent workload | MoiraWeave control plane |
 | Event | Timeline entry emitted by API, worker, adapter, or runtime | MoiraWeave control plane |
 | Artifact | Metadata for files or outputs produced by a run | Workload produces, MoiraWeave indexes |
+| Environment | A deployment scope such as `local`, `dev`, `staging`, or `prod` | You choose, MoiraWeave records |
 | Audit event | Durable record of a sensitive platform action | MoiraWeave control plane |
 
 ## Design Principles
@@ -25,6 +26,9 @@ control plane for model services, pipelines, and agent runtimes.
 - Durable control plane: Postgres stores workloads, runs, sessions, messages, events, artifact metadata, and audit events.
 - Redis as queue only: Redis is used for dispatch and short-lived worker coordination.
 - UI/API canonical channel: MoiraWeave owns dashboard/API sessions; Telegram, Slack, Discord, and webhooks can stay runtime-owned and supervised when duplicating them in the UI is not worth the product complexity.
+- Environment-scoped operations: deployment records, deployment operations,
+  workload health, and preflight can be filtered by environment so local tests do
+  not hide production state.
 - Audit actions, not secrets: deploy operations, run cancellation, agent/channel messages, and artifact access are traceable without storing secret values.
 - Secret names only: manifests declare required secret names, while values stay in
   `.env`, Kubernetes Secrets, or an external secret manager. The API, CLI, and

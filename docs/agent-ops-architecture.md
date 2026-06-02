@@ -95,12 +95,12 @@ sequenceDiagram
   participant DB as Postgres
   participant UI as Ops Dashboard
 
-  O->>CLI: moira deploy local or k8s
+  O->>CLI: moira deploy local or k8s --env prod
   CLI->>O: Generate/apply runtime manifests
-  CLI->>API: POST /v1/workloads/{name}/deployments
+  CLI->>API: POST /v1/workloads/{name}/deployments with env
   API->>DB: Upsert deployment record and audit event
-  UI->>API: GET /v1/workloads/{name}/health
-  API->>DB: Read deployment/run/session state
+  UI->>API: GET /v1/workloads/{name}/health?env=prod
+  API->>DB: Read env-scoped deployment/run/session state
   API-->>UI: healthy, pending, degraded, or unknown
 ```
 
@@ -133,14 +133,14 @@ sequenceDiagram
 
 MoiraWeave owns:
 
-- workload deployment metadata
+- environment-scoped workload deployment metadata
 - deployment health derived from control-plane state
 - sessions, messages, runs, events, artifacts, and health
 - audit records for deployment operations, cancellation, artifact access, UI/API
   agent messages, and MoiraWeave-owned connector ingress
 - cancellation and stale-run detection
 - UI/API/CLI surfaces
-- environment-specific deployment assets
+- environment-specific deployment assets and deployment operation history
 
 Agent runtimes own:
 
@@ -169,9 +169,9 @@ Runtime-specific details live in
 
 ## Current API Surface
 
-- `POST /v1/workloads/{name}/deployments`: record local or Kubernetes deployment state.
-- `GET /v1/deployments`: list deployment records visible to the authenticated user.
-- `GET /v1/workloads/{name}/health`: summarize health from deployment state and probe deployment endpoints when present.
+- `POST /v1/workloads/{name}/deployments`: record local, Kubernetes, or external deployment state for an environment.
+- `GET /v1/deployments`: list deployment records visible to the authenticated user, optionally filtered by workload and environment.
+- `GET /v1/workloads/{name}/health`: summarize health from environment-scoped deployment state and probe deployment endpoints when present.
 - `POST /v1/channels/{channel}/agents/{name}/messages`: authenticated inbound channel bridge.
 - `GET /v1/agents/{name}/sessions/{session_id}/health`: summarize a session and its latest run.
 - `GET /v1/audit-events`: list the authenticated subject's audit events, with filters for action and resource.
