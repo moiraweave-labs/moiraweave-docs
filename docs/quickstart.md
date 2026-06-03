@@ -26,8 +26,8 @@ moira up
 
 `moira up` initializes the workspace if needed, creates a no-secret demo agent
 when there are no workloads, generates local workload Compose services, runs
-`moira doctor`, starts the platform and workloads, waits for API readiness, and
-registers workload/deployment records.
+`moira doctor`, starts the platform and workloads, waits for API and UI
+readiness, and registers workload/deployment records.
 
 Local records are stored under the `local` environment. When you later use
 Kubernetes or an external runtime, keep its records in `dev`, `staging`, `prod`,
@@ -90,7 +90,9 @@ and first-run `moira up` to work without a registry login.
 In the dashboard:
 
 - Workloads: create workloads from templates, then jump directly to preflight
-  or the agent console.
+  or the agent console. Agent templates show runtime-owned capabilities such as
+  web search, browser automation, terminal access, MCP, messaging, and external
+  channels before the workload is created.
 - Operations: run preflight, view recommended actions, inspect deployment
   records, view deployment plans, sync deployment records, and review
   deployment operation history. Select the environment first: `local` for
@@ -139,7 +141,11 @@ moira workload new hermes \
 ```
 
 MoiraWeave deploys and supervises the runtime, but Hermes/OpenClaw keep their
-own reasoning loop, tools, memory, and runtime-specific configuration.
+own reasoning loop, tools, memory, and runtime-specific configuration. If those
+runtimes use web search, browser automation, terminal backends, MCP servers, or
+native channels such as Telegram, declare those needs in the workload manifest;
+MoiraWeave prepares the deployment boundary and observes health, but it does not
+proxy or reimplement the tools.
 
 Before starting the stack, inspect required names without exposing values:
 
