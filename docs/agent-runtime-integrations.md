@@ -231,7 +231,8 @@ MoiraWeave uses three test levels for agent integrations:
 - Compose E2E tests use mock agents and models to validate the MoiraWeave
   control plane, Redis dispatch, event storage, cancellation, and artifacts.
 - Optional live-runtime tests can be run against real Hermes/OpenClaw endpoints.
-  They are skipped by default and enabled with environment variables:
+  They are skipped by default and enabled with environment variables. The basic
+  health tests do not send an agent turn:
 
 ```bash
 MOIRAWEAVE_REAL_AGENT_TESTS=1 \
@@ -245,10 +246,36 @@ Use `MOIRAWEAVE_REAL_HERMES_AUTH_TOKEN_ENV` or
 token. The variable value should be the name of the env var containing the
 token, for example `HERMES_API_SERVER_KEY`.
 
+Turn tests are intentionally gated by separate flags because they create real
+runtime work and may call external model providers:
+
+```bash
+MOIRAWEAVE_REAL_AGENT_TESTS=1 \
+MOIRAWEAVE_REAL_HERMES_URL=http://localhost:8642 \
+MOIRAWEAVE_REAL_HERMES_TURN_TEST=1 \
+MOIRAWEAVE_REAL_HERMES_MESSAGE="Reply with the single word moiraweave-ok." \
+uv run pytest services/worker/tests/test_real_agent_runtimes.py -m real_agent
+```
+
+For OpenClaw, use:
+
+```bash
+MOIRAWEAVE_REAL_AGENT_TESTS=1 \
+MOIRAWEAVE_REAL_OPENCLAW_URL=http://localhost:18789 \
+MOIRAWEAVE_REAL_OPENCLAW_AGENT_ID=main \
+MOIRAWEAVE_REAL_OPENCLAW_TURN_TEST=1 \
+uv run pytest services/worker/tests/test_real_agent_runtimes.py -m real_agent
+```
+
+`MOIRAWEAVE_REAL_AGENT_TURN_TIMEOUT_SECONDS` defaults to `120` and can be
+raised for slower long-running agent profiles.
+
 The core repository also exposes a manual GitHub Actions workflow named
 `Live Agent Integrations`. Dispatch it with `hermes_url` and/or `openclaw_url`.
 If the runtimes require tokens, configure repository secrets named
-`HERMES_API_SERVER_KEY` and `OPENCLAW_GATEWAY_TOKEN`.
+`HERMES_API_SERVER_KEY` and `OPENCLAW_GATEWAY_TOKEN`. The workflow runs health
+checks by default. Enable `hermes_turn_test` or `openclaw_turn_test` only when
+you want it to create real agent work.
 
 ## Sources
 
