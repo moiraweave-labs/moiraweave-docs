@@ -20,6 +20,17 @@ MoiraWeave should not import runtime internals, patch agent memory, or call tool
 implementations directly. That keeps upgrades and agent-specific configuration
 inside the runtime.
 
+## Tool Ownership
+
+Agent tools stay runtime-owned. MoiraWeave prepares the runtime boundary:
+workspace, persistence, secrets, egress, resources, health, events, artifacts,
+and cancellation. It does not decide when Hermes/OpenClaw uses web search,
+browser automation, terminal backends, MCP servers, memory, or native channels.
+
+Use `spec.agent.toolOwnership: runtime` and `spec.agent.runtimeRequirements` to
+declare what the runtime needs. Preflight checks this declaration for obvious
+environment conflicts, but it does not manage the tools themselves.
+
 ## Deployment Placement
 
 Agent workloads have two placement modes:
@@ -106,14 +117,32 @@ spec:
     - HERMES_API_SERVER_KEY
   persistence:
     enabled: true
-    mountPath: /data
+    mountPath: /workspace
   agent:
     adapter: hermes
+    toolOwnership: runtime
     authTokenEnv: HERMES_API_SERVER_KEY
     model: hermes-agent
     workspaceMount: /workspace
     exposedChannels: [ui, api]
     externalOwnedChannels: [telegram]
+    runtimeRequirements:
+      filesystem:
+        persistentWorkspace: true
+        workspaceMount: /workspace
+      network:
+        egress: enabled
+      webSearch:
+        enabled: true
+      browser:
+        mode: runtime-managed
+      terminal:
+        mode: runtime-managed
+        approval: runtime
+      mcp:
+        enabled: true
+      messaging:
+        enabled: true
     dispatchTimeoutSeconds: 10
     pollIntervalSeconds: 2
 ```
@@ -169,13 +198,31 @@ spec:
     - OPENCLAW_GATEWAY_TOKEN
   persistence:
     enabled: true
-    mountPath: /data
+    mountPath: /workspace
   agent:
     adapter: openclaw
+    toolOwnership: runtime
     authTokenEnv: OPENCLAW_GATEWAY_TOKEN
     agentId: main
     workspaceMount: /workspace
     exposedChannels: [ui, api]
+    runtimeRequirements:
+      filesystem:
+        persistentWorkspace: true
+        workspaceMount: /workspace
+      network:
+        egress: enabled
+      webSearch:
+        enabled: true
+      browser:
+        mode: runtime-managed
+      terminal:
+        mode: runtime-managed
+        approval: runtime
+      mcp:
+        enabled: true
+      messaging:
+        enabled: true
     dispatchTimeoutSeconds: 10
     pollIntervalSeconds: 2
 ```
@@ -194,6 +241,10 @@ spec:
     mode: external
   agent:
     adapter: hermes
+    toolOwnership: runtime
+    runtimeRequirements:
+      network:
+        egress: restricted
 ```
 
 When the manifest is registered with `moira deploy local --register` or

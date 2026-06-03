@@ -33,6 +33,10 @@ control plane for model services, pipelines, and agent runtimes.
 - Secret names only: manifests declare required secret names, while values stay in
   `.env`, Kubernetes Secrets, or an external secret manager. The API, CLI, and
   UI show presence and missing names, never secret values.
+- Runtime-owned tools: `spec.agent.runtimeRequirements` describes filesystem,
+  network, browser, terminal, MCP, messaging, and web-search boundaries that
+  MoiraWeave should prepare or validate. It is not a tool registry and
+  MoiraWeave does not route individual tool calls.
 
 ## Agent Boundary
 
@@ -45,6 +49,7 @@ MoiraWeave owns:
 - events, logs, and artifact metadata
 - audit events for sensitive control-plane actions
 - required secret names and preflight status
+- runtime requirement validation for workspace, egress, channels, and secrets
 
 Agent runtimes own:
 
@@ -53,6 +58,8 @@ Agent runtimes own:
 - internal memory
 - runtime-specific configuration
 - model provider integrations
+- browser, terminal, web-search, MCP, and messaging behavior when declared as
+  runtime-owned
 
 ## Related Pages
 

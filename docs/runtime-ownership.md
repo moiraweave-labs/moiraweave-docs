@@ -37,6 +37,44 @@ For agents that run for hours or days, the adapter should acknowledge quickly an
 let MoiraWeave poll or stream events. Keeping a single HTTP request open for the
 whole reasoning loop is not the intended operating model.
 
+## Runtime Requirements And Boundaries
+
+MoiraWeave does not register or orchestrate every runtime tool. It prepares the
+environment the runtime needs and records the boundary in `workload.yaml`:
+
+```yaml
+spec:
+  agent:
+    adapter: hermes
+    toolOwnership: runtime
+    workspaceMount: /workspace
+    runtimeRequirements:
+      filesystem:
+        persistentWorkspace: true
+        workspaceMount: /workspace
+      network:
+        egress: enabled
+      webSearch:
+        enabled: true
+      browser:
+        mode: runtime-managed
+      terminal:
+        mode: runtime-managed
+        approval: runtime
+      mcp:
+        enabled: true
+      messaging:
+        enabled: true
+```
+
+This means Hermes, OpenClaw, or a custom runtime decides when and how to call
+web search, browser, terminal, MCP, messaging, memory, or provider tools.
+MoiraWeave only checks that the declared environment is plausible: secrets are
+present, network and workspace boundaries make sense, and deployment health is
+visible. If a runtime needs direct access to a user's machine or a channel it
+fully owns, run it as an external-owned runtime and let MoiraWeave supervise it
+through the adapter.
+
 ## Long-Running Recovery
 
 Long-running runs are tracked in Postgres, not Redis. The worker writes
