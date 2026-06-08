@@ -111,10 +111,8 @@ spec:
     API_SERVER_ENABLED: "true"
     API_SERVER_HOST: "0.0.0.0"
     API_SERVER_PORT: "8642"
-    API_SERVER_KEY: "${HERMES_API_SERVER_KEY}"
   secrets:
     - OPENAI_API_KEY
-    - HERMES_API_SERVER_KEY
   persistence:
     enabled: true
     mountPath: /workspace
@@ -147,10 +145,10 @@ spec:
     pollIntervalSeconds: 2
 ```
 
-For a single local Hermes runtime, `authTokenEnv: API_SERVER_KEY` also works if
-the same `.env` value is shared with the worker. For multiple Hermes profiles,
-prefer one token env var per workload and map it to `API_SERVER_KEY` inside the
-runtime environment as shown above.
+`authTokenEnv` is treated as a secret environment variable by Docker Compose and
+Helm generation. Use the env var name that the runtime reads for its API token.
+For multiple Hermes profiles, prefer one token env var per workload so each
+runtime can rotate independently.
 
 ## OpenClaw
 
@@ -192,10 +190,6 @@ spec:
   ports:
     - name: gateway
       port: 18789
-  env:
-    OPENCLAW_GATEWAY_TOKEN: "${OPENCLAW_GATEWAY_TOKEN}"
-  secrets:
-    - OPENCLAW_GATEWAY_TOKEN
   persistence:
     enabled: true
     mountPath: /workspace

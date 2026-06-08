@@ -133,7 +133,6 @@ moira workload new hermes \
   --adapter hermes \
   --port 8642 \
   --secret OPENAI_API_KEY \
-  --secret HERMES_API_SERVER_KEY \
   --auth-token-env HERMES_API_SERVER_KEY \
   --persistence \
   --mount-path /workspace \
