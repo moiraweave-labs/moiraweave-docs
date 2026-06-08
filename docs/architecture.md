@@ -125,7 +125,10 @@ session health, agent messages, channel ownership, preflight, deployment
 planning, secret inventory, deployment record sync, and health.
 Operations Center keeps the selected environment explicit so an operator can
 compare created, deployed, reachable, and healthy state without mixing local and
-cluster records.
+cluster records. Its deployment readiness guide uses the same product language
+as `moira doctor`: missing secrets, deployment records, worker dispatch, runtime
+reachability, Docker/Compose, and runtime boundary checks become concrete next
+commands while secret values remain outside MoiraWeave.
 
 API access uses bearer credentials. Local development can issue demo JWTs with
 `DEMO_USERNAME`, `DEMO_PASSWORD`, and `DEMO_ROLE`. Automation can use API keys
@@ -160,12 +163,13 @@ inventory, control-plane dependencies, and runtime reachability when a
 registered endpoint exists. Deployment operations are stored as a navigable
 history so operators can inspect plans, syncs, blocked applies/undeploys,
 generated commands, next actions, events, timestamps, and outcomes after the
-fact. The CLI is still
-required for workspace-local actions that need filesystem, Docker, Helm, or
-Kubernetes credentials: `moira init`, `moira up`, Compose/Helm generation,
-`deploy local --up`, `deploy k8s --apply`, logs, and undeploy-style operations.
-The UI deliberately talks only to the API gateway and does not get direct access
-to Redis, Docker, Kubernetes, or local files.
+fact. The CLI is still required for workspace-local actions that need
+filesystem, Docker, Helm, or Kubernetes credentials: `moira init`, `moira up`,
+Compose/Helm generation, `deploy local --up`, `deploy k8s --apply`, logs, and
+undeploy-style operations. `moira doctor --json` exposes an `action_guide` so CI
+or setup scripts can consume the same readiness guidance shown to operators. The
+UI deliberately talks only to the API gateway and does not get direct access to
+Redis, Docker, Kubernetes, or local files.
 
 Artifact content is served only when the artifact URI resolves inside the API
 gateway artifact storage root. Local Compose uses the configured

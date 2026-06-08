@@ -76,6 +76,13 @@ moira doctor
 
 For automation, use `moira doctor --json`.
 
+Both the CLI and dashboard expose a deployment readiness guide. In the CLI it is
+printed after the doctor checks and returned as `action_guide` in JSON output.
+In Operations Center it appears next to the operational snapshot. For real
+agents, this guide turns missing secrets, Docker/Compose issues, worker
+dispatch, runtime reachability, and deployment record gaps into concrete next
+commands without exposing secret values.
+
 If you run development builds or private registries, override platform images in
 `.env` with `MOIRAWEAVE_API_GATEWAY_IMAGE`, `MOIRAWEAVE_WORKER_IMAGE`, and
 `MOIRAWEAVE_UI_IMAGE`. `moira doctor` checks whether required images are locally
@@ -99,7 +106,9 @@ In the dashboard:
   `moira up`, or `dev`/`staging`/`prod` for cluster and external runtimes.
   Preflight separates Postgres, Redis, worker dispatch, environment-scoped
   deployment records, secrets, and runtime reachability so queued agent turns
-  have an actionable cause.
+  have an actionable cause. The readiness guide summarizes those checks as
+  next commands such as setting missing secret names, syncing deployment records,
+  checking worker logs, or inspecting runtime logs.
 - Agents: the first agent and existing session are selected automatically; start
   the first session from the empty-state CTA, send a message, cancel/retry a
   turn, watch session health, and follow the exact linked run status even when
@@ -171,7 +180,7 @@ controller to execute; the browser does not receive deployment credentials.
 | `moira doctor` reports official images unavailable | GHCR images were pushed but package visibility is not public | In GitHub Packages, set `moiraweave/api-gateway`, `moiraweave/worker`, and `moiraweave-ui` to public, then rerun `moira doctor` |
 | `moira doctor` warns about transient registry failures | Registry/network timeout, 429, or temporary GHCR issue | Retry `moira up`; Docker may still pull the images. If it persists, login to the registry or override `MOIRAWEAVE_*_IMAGE` |
 | `moira doctor` reports custom images unavailable | The image is private, unpublished, or the registry login is missing | Publish/login to the registry or override `MOIRAWEAVE_*_IMAGE` in `.env` |
-| `moira up` reports missing environment variables | Required workload secrets are not available locally | Run `moira doctor` or `moira secrets list`, then add missing names to `.env` or export them |
+| `moira up` reports missing environment variables | Required workload secrets are not available locally | Run `moira doctor` and follow the readiness guide, or run `moira secrets list`, then add missing names to `.env` or export them |
 | Login fails | Local demo password was overridden | Check `DEMO_USERNAME` and `DEMO_PASSWORD` in `.env` |
 | API request returns `403` | The token role is too limited | Use an `operator` or `admin` token for mutating actions |
 | Workload is created but not healthy | Runtime service is missing or not reachable | Use Operations preflight and workload logs |
