@@ -20,6 +20,32 @@ MoiraWeave should not import runtime internals, patch agent memory, or call tool
 implementations directly. That keeps upgrades and agent-specific configuration
 inside the runtime.
 
+## Versioned Examples
+
+The `moiraweave` repository includes canonical workload examples under
+`examples/workloads`:
+
+- `hermes/workload.yaml`: managed Hermes Agent with HTTP `/health` probes,
+  workspace persistence, OpenAI secret reference, and runtime-owned tools.
+- `openclaw/workload.yaml`: managed OpenClaw Gateway with TCP probes,
+  workspace persistence, gateway token secret reference, and runtime-owned
+  browser/tool capabilities.
+- `external-hermes/workload.yaml`: externally deployed Hermes runtime that
+  MoiraWeave supervises through an endpoint without deploying the process.
+
+Copy one into `.moiraweave/workloads/<name>/workload.yaml`, then run:
+
+```bash
+moira deploy local
+moira up
+moira workload deploy <name> --target local
+moira agent session create <name>
+```
+
+Hermes and OpenClaw can be deployed together as separate workloads. Their
+service names and ports must be unique, and each runtime should get its own
+workspace and token secret.
+
 ## Tool Ownership
 
 Agent tools stay runtime-owned. MoiraWeave prepares the runtime boundary:

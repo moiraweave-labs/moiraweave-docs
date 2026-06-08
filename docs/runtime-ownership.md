@@ -75,6 +75,14 @@ visible. If a runtime needs direct access to a user's machine or a channel it
 fully owns, run it as an external-owned runtime and let MoiraWeave supervise it
 through the adapter.
 
+Managed deployment isolation should not be interpreted as disabling the agent's
+tools. A managed Hermes/OpenClaw container can still use web search, browser
+automation, terminal backends, MCP servers, provider APIs, or runtime-native
+channels when those capabilities are configured inside the runtime and the
+workload declares the required egress, workspace, and secrets. MoiraWeave does
+not proxy or approve each internal tool call; it gives operators a clear place
+to see what boundary was requested and whether the runtime is healthy.
+
 ## Long-Running Recovery
 
 Long-running runs are tracked in Postgres, not Redis. The worker writes
