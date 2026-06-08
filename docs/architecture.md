@@ -83,12 +83,37 @@ The worker exposes a Prometheus metrics port named `metrics`. On Kubernetes,
 MoiraWeave ServiceMonitor, PodMonitor, PrometheusRule, and Grafana dashboard
 ConfigMaps from `infra/k8s/monitoring/`.
 
+The monitoring chart installs Prometheus, Alertmanager, Grafana, Loki, Promtail,
+and Jaeger. Prometheus is configured to discover ServiceMonitor, PodMonitor, and
+PrometheusRule resources across namespaces. Grafana loads dashboards from
+ConfigMaps labelled `grafana_dashboard=1`, and Loki is registered as a Grafana
+datasource so control-plane logs and metrics can be inspected together.
+
+When Kubernetes NetworkPolicy is enabled, the platform chart explicitly allows
+the `monitoring` namespace to scrape the API gateway on port `8000` and the
+worker on port `9090`. Without those rules, the monitoring resources can render
+successfully while Prometheus cannot reach the targets.
+
 The monitoring stack is intentionally separate from workload placement. Managed
 agent/model workloads may expose their own metrics endpoints later, but the
 core control-plane metrics are deployed with the platform monitoring install.
 The API `/ready` response also reports `run_queue` state, including the Redis
 stream, worker consumer group, attached consumers, pending count, and lag when
 available.
+
+Useful checks after a cluster install:
+
+```bash
+make helm-monitoring-install
+kubectl -n monitoring get servicemonitor,podmonitor,prometheusrule
+kubectl -n monitoring get configmap -l grafana_dashboard=1
+kubectl -n monitoring port-forward svc/moiraweave-monitoring-grafana 3000:80
+```
+
+In Grafana, open the system overview dashboard and confirm that API request
+rate, API error rate, worker jobs processed, and namespace pod health show data.
+If those panels are empty, check Prometheus targets first, then the MoiraWeave
+ServiceMonitor/PodMonitor selectors, then NetworkPolicy.
 
 ## UI And CLI Boundary
 
