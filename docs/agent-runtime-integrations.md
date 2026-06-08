@@ -107,6 +107,22 @@ spec:
   ports:
     - name: http
       port: 8642
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 15
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
   env:
     API_SERVER_ENABLED: "true"
     API_SERVER_HOST: "0.0.0.0"
@@ -150,6 +166,11 @@ Helm generation. Use the env var name that the runtime reads for its API token.
 For multiple Hermes profiles, prefer one token env var per workload so each
 runtime can rotate independently.
 
+Kubernetes probes use `/health` because it is safe for unauthenticated process
+readiness. The Hermes adapter can still call `/health/detailed` with the
+runtime token during preflight and runtime status checks when that endpoint is
+available.
+
 ## OpenClaw
 
 OpenClaw is not an HTTP agent endpoint. Its stable integration surface is the
@@ -190,6 +211,20 @@ spec:
   ports:
     - name: gateway
       port: 18789
+  livenessProbe:
+    tcpSocket:
+      port: gateway
+    initialDelaySeconds: 15
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    tcpSocket:
+      port: gateway
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
   persistence:
     enabled: true
     mountPath: /workspace
@@ -224,6 +259,14 @@ spec:
 MoiraWeave session ids become OpenClaw session keys in the form
 `agent:{agentId}:{session_id}` unless the payload already provides a
 runtime-native `session_key`.
+
+Kubernetes probes check that the Gateway socket is reachable. Protocol health is
+still checked by the OpenClaw adapter through the Gateway `health` RPC, so
+MoiraWeave can distinguish "process listening" from "agent protocol healthy".
+
+Docker Compose does not inject image-dependent `curl` or shell healthchecks into
+third-party agent images. Local reachability is checked by `moira doctor`,
+preflight, and adapter health calls through the MoiraWeave API.
 
 External OpenClaw or Hermes runtimes should use the same `agent` block but set:
 
