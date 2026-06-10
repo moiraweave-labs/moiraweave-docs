@@ -352,7 +352,7 @@ MoiraWeave uses three test levels for agent integrations:
 MOIRAWEAVE_REAL_AGENT_TESTS=1 \
 MOIRAWEAVE_REAL_HERMES_URL=http://localhost:8642 \
 MOIRAWEAVE_REAL_OPENCLAW_URL=http://localhost:18789 \
-uv run pytest services/worker/tests/test_real_agent_runtimes.py
+make test-real-agents
 ```
 
 Use `MOIRAWEAVE_REAL_HERMES_AUTH_TOKEN_ENV` or
@@ -368,7 +368,7 @@ MOIRAWEAVE_REAL_AGENT_TESTS=1 \
 MOIRAWEAVE_REAL_HERMES_URL=http://localhost:8642 \
 MOIRAWEAVE_REAL_HERMES_TURN_TEST=1 \
 MOIRAWEAVE_REAL_HERMES_MESSAGE="Reply with the single word moiraweave-ok." \
-uv run pytest services/worker/tests/test_real_agent_runtimes.py -m real_agent
+make test-real-agents
 ```
 
 For OpenClaw, use:
@@ -378,18 +378,19 @@ MOIRAWEAVE_REAL_AGENT_TESTS=1 \
 MOIRAWEAVE_REAL_OPENCLAW_URL=http://localhost:18789 \
 MOIRAWEAVE_REAL_OPENCLAW_AGENT_ID=main \
 MOIRAWEAVE_REAL_OPENCLAW_TURN_TEST=1 \
-uv run pytest services/worker/tests/test_real_agent_runtimes.py -m real_agent
+make test-real-agents
 ```
 
 `MOIRAWEAVE_REAL_AGENT_TURN_TIMEOUT_SECONDS` defaults to `120` and can be
 raised for slower long-running agent profiles.
 
 The core repository also exposes a manual GitHub Actions workflow named
-`Live Agent Integrations`. Dispatch it with `hermes_url` and/or `openclaw_url`.
-If the runtimes require tokens, configure repository secrets named
-`HERMES_API_SERVER_KEY` and `OPENCLAW_GATEWAY_TOKEN`. The workflow runs health
-checks by default. Enable `hermes_turn_test` or `openclaw_turn_test` only when
-you want it to create real agent work.
+`Live Agent Integrations`. It runs the same `make test-real-agents` target.
+Dispatch it with `hermes_url` and/or `openclaw_url`. If the runtimes require
+tokens, configure repository secrets named `HERMES_API_SERVER_KEY` and
+`OPENCLAW_GATEWAY_TOKEN`. The workflow runs health checks by default. Enable
+`hermes_turn_test` or `openclaw_turn_test` only when you want it to create real
+agent work.
 
 ## Sources
 
