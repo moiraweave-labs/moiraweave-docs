@@ -59,6 +59,9 @@ The local demo user has the `admin` role by default. For automation, open
 Security in the dashboard or call `POST /auth/api-keys` to create a hashed API
 key. Copy the returned `mwk_...` secret immediately; MoiraWeave stores only the
 hash, prefix, subject, role, timestamps, and revocation state in Postgres.
+Admins can rotate keys from Security or `POST /auth/api-keys/{key_id}/rotate`
+when automation credentials need replacement; the old key is revoked and the
+new secret is also shown once.
 Static bootstrap keys are still supported through `MOIRA_API_KEYS` with
 comma-separated `key:subject:role` entries. The dashboard resolves the active
 credential with `GET /auth/me`, shows the current role in the header, and

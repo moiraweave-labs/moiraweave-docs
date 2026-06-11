@@ -134,8 +134,11 @@ API access uses bearer credentials. Local development can issue demo JWTs with
 `DEMO_USERNAME`, `DEMO_PASSWORD`, and `DEMO_ROLE`. Automation should use hashed
 API keys created by an admin through the Security screen or `/auth/api-keys`;
 the secret is shown once, then only metadata, hash, last-use timestamp, and
-revocation state remain in Postgres. Static bootstrap keys can still be defined
-as comma-separated `key:subject:role` entries in `MOIRA_API_KEYS`. Clients
+revocation state remain in Postgres. Existing keys can be rotated with
+`POST /auth/api-keys/{key_id}/rotate`, which returns a new one-time secret,
+keeps subject/role intent, and revokes the previous key. Static bootstrap keys
+can still be defined as comma-separated `key:subject:role` entries in
+`MOIRA_API_KEYS`. Clients
 resolve the current credential through `GET /auth/me`, and the UI shows the
 subject, role, and API-key/JWT credential type before enabling mutating actions.
 The initial role model is intentionally small: `viewer` can inspect, `operator`

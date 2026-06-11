@@ -33,7 +33,8 @@ control plane for model services, pipelines, and agent runtimes.
 - Audit actions, not secrets: API key lifecycle, deploy operations, run cancellation, agent/channel messages, and artifact access are traceable without storing secret values.
 - API keys are one-time secret values: the dashboard/API returns the `mwk_...`
   secret only when an admin creates it. After that, MoiraWeave stores metadata,
-  a hash, last-use timestamp, and revocation state.
+  a hash, last-use timestamp, and revocation state. Rotating a key creates a
+  new one-time secret and revokes the old credential.
 - Secret names only: manifests declare required secret names, while values stay in
   `.env`, Kubernetes Secrets, or an external secret manager. The API, CLI, and
   UI show presence and missing names, never secret values.
