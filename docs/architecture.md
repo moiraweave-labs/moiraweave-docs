@@ -131,13 +131,16 @@ reachability, Docker/Compose, and runtime boundary checks become concrete next
 commands while secret values remain outside MoiraWeave.
 
 API access uses bearer credentials. Local development can issue demo JWTs with
-`DEMO_USERNAME`, `DEMO_PASSWORD`, and `DEMO_ROLE`. Automation can use API keys
-defined as comma-separated `key:subject:role` entries in `MOIRA_API_KEYS`.
-Clients resolve the current credential through `GET /auth/me`, and the UI shows
-the subject, role, and API-key/JWT credential type before enabling mutating
-actions. The initial role model is intentionally small: `viewer` can inspect,
-`operator` can run, cancel, message agents, preflight, and record deployment
-operations, and `admin` can create workloads and inspect secret inventory.
+`DEMO_USERNAME`, `DEMO_PASSWORD`, and `DEMO_ROLE`. Automation should use hashed
+API keys created by an admin through the Security screen or `/auth/api-keys`;
+the secret is shown once, then only metadata, hash, last-use timestamp, and
+revocation state remain in Postgres. Static bootstrap keys can still be defined
+as comma-separated `key:subject:role` entries in `MOIRA_API_KEYS`. Clients
+resolve the current credential through `GET /auth/me`, and the UI shows the
+subject, role, and API-key/JWT credential type before enabling mutating actions.
+The initial role model is intentionally small: `viewer` can inspect, `operator`
+can run, cancel, message agents, preflight, and record deployment operations,
+and `admin` can create workloads, inspect secret inventory, and manage API keys.
 
 Secret inventory is deliberately metadata-only. The API returns required names,
 presence, source, workload references, and remediation; it does not return
@@ -146,12 +149,13 @@ values stay in Secrets or external secret managers, and the UI only displays
 whether each required name is present from the API gateway point of view.
 
 Audit events are stored in Postgres and scoped to the authenticated subject.
-The current trail records deployment records, deployment operations, run
-cancellation, agent messages, channel ingress messages, artifact previews, and
-artifact downloads. These records are operational breadcrumbs for teams: who
-asked MoiraWeave to do something sensitive, against which resource, and with
-which non-secret metadata. They are available through `GET /v1/audit-events`;
-the UI can surface them without direct database access.
+The current trail records API key lifecycle changes, deployment records,
+deployment operations, run cancellation, agent messages, channel ingress
+messages, artifact previews, and artifact downloads. These records are
+operational breadcrumbs for teams: who asked MoiraWeave to do something
+sensitive, against which resource, and with which non-secret metadata. They are
+available through `GET /v1/audit-events`; the UI can surface them without direct
+database access.
 
 The API can return a deployment plan for each workload and target, including
 generated files, service endpoint, and the CLI/Helm commands needed to apply it.

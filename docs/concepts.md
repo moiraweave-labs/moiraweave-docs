@@ -18,6 +18,7 @@ control plane for model services, pipelines, and agent runtimes.
 | Artifact | Metadata for files or outputs produced by a run | Workload produces, MoiraWeave indexes |
 | Environment | A deployment scope such as `local`, `dev`, `staging`, or `prod` | You choose, MoiraWeave records |
 | Audit event | Durable record of a sensitive platform action | MoiraWeave control plane |
+| API key | Hashed bearer credential for automation, scoped to a subject and role | Admin creates, MoiraWeave validates |
 
 ## Design Principles
 
@@ -29,7 +30,10 @@ control plane for model services, pipelines, and agent runtimes.
 - Environment-scoped operations: deployment records, deployment operations,
   workload health, and preflight can be filtered by environment so local tests do
   not hide production state.
-- Audit actions, not secrets: deploy operations, run cancellation, agent/channel messages, and artifact access are traceable without storing secret values.
+- Audit actions, not secrets: API key lifecycle, deploy operations, run cancellation, agent/channel messages, and artifact access are traceable without storing secret values.
+- API keys are one-time secret values: the dashboard/API returns the `mwk_...`
+  secret only when an admin creates it. After that, MoiraWeave stores metadata,
+  a hash, last-use timestamp, and revocation state.
 - Secret names only: manifests declare required secret names, while values stay in
   `.env`, Kubernetes Secrets, or an external secret manager. The API, CLI, and
   UI show presence and missing names, never secret values.

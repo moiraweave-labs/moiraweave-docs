@@ -55,11 +55,14 @@ Open `http://localhost:3000/agents`, then sign in with:
 admin / demo-password
 ```
 
-The local demo user has the `admin` role by default. For automation, set
-`MOIRA_API_KEYS` with comma-separated `key:subject:role` entries and use the key
-as a bearer token. The dashboard resolves the active credential with
-`GET /auth/me`, shows the current role in the header, and disables actions that
-need a higher role before they fail server-side.
+The local demo user has the `admin` role by default. For automation, open
+Security in the dashboard or call `POST /auth/api-keys` to create a hashed API
+key. Copy the returned `mwk_...` secret immediately; MoiraWeave stores only the
+hash, prefix, subject, role, timestamps, and revocation state in Postgres.
+Static bootstrap keys are still supported through `MOIRA_API_KEYS` with
+comma-separated `key:subject:role` entries. The dashboard resolves the active
+credential with `GET /auth/me`, shows the current role in the header, and
+disables actions that need a higher role before they fail server-side.
 
 For a terminal-only smoke test, use one command that creates a session when
 needed, sends the message, and watches the associated run:
