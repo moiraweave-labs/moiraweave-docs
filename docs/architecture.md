@@ -39,6 +39,9 @@ For long-running agents, Postgres is the durable source of truth. Workers update
 `heartbeat_at`, stale active runs become `lost`, and Redis pending entries are
 only reclaimed when the run state says it is safe. This prevents an idle Redis
 pending message from duplicating an agent turn that is still heartbeating.
+Transient executor failures are retried with bounded backoff inside the workload
+timeout, and duplicate dispatch messages for already-active runs are acknowledged
+without re-running the agent action.
 
 ## Agent Flow
 
@@ -74,6 +77,9 @@ an operator is currently working on.
 commands and deployment operations use the selected CLI/UI environment, commonly
 `dev`, `staging`, or `prod`. Audit events include the environment as non-secret
 metadata when a deployment record or operation is created.
+`GET /v1/environments` summarizes the environments visible to the authenticated
+subject from deployment records and deployment operations, so UI and CLI can
+show environment counts without reaching into Postgres directly.
 
 ## Observability
 
@@ -131,19 +137,23 @@ reachability, Docker/Compose, and runtime boundary checks become concrete next
 commands while secret values remain outside MoiraWeave.
 
 API access uses bearer credentials. Local development can issue demo JWTs with
-`DEMO_USERNAME`, `DEMO_PASSWORD`, and `DEMO_ROLE`. Automation should use hashed
-API keys created by an admin through the Security screen or `/auth/api-keys`;
-the secret is shown once, then only metadata, hash, last-use timestamp, and
-revocation state remain in Postgres. Existing keys can be rotated with
-`POST /auth/api-keys/{key_id}/rotate`, which returns a new one-time secret,
-keeps subject/role intent, and revokes the previous key. Static bootstrap keys
-can still be defined as comma-separated `key:subject:role` entries in
-`MOIRA_API_KEYS`. Clients
-resolve the current credential through `GET /auth/me`, and the UI shows the
-subject, role, and API-key/JWT credential type before enabling mutating actions.
-The initial role model is intentionally small: `viewer` can inspect, `operator`
-can run, cancel, message agents, preflight, and record deployment operations,
-and `admin` can create workloads, inspect secret inventory, and manage API keys.
+`DEMO_USERNAME`, `DEMO_PASSWORD`, and `DEMO_ROLE`. Admins can create persistent
+users through `/auth/users`, teams through `/auth/teams`, and team memberships
+through `/auth/teams/{team_id}/members`; persistent users authenticate through
+the same `/auth/token` endpoint with PBKDF2-hashed passwords stored in
+Postgres. Automation should use hashed API keys created by an admin through the
+Security screen or `/auth/api-keys`; keys can optionally be scoped to a team.
+The secret is shown once, then only metadata, team scope, hash, last-use
+timestamp, and revocation state remain in Postgres. Existing keys can be rotated
+with `POST /auth/api-keys/{key_id}/rotate`, which returns a new one-time secret,
+keeps subject/role/team intent, and revokes the previous key. Static bootstrap
+keys can still be defined as comma-separated `key:subject:role` entries in
+`MOIRA_API_KEYS`. Clients resolve the current credential through `GET /auth/me`,
+and the UI shows the subject, role, team scope, memberships, and API-key/JWT
+credential type before enabling mutating actions. The initial role model is
+intentionally small: `viewer` can inspect, `operator` can run, cancel, message
+agents, preflight, and record deployment operations, and `admin` can create
+workloads, inspect secret inventory, and manage users, teams, and API keys.
 
 Secret inventory is deliberately metadata-only. The API returns required names,
 presence, source, workload references, and remediation; it does not return
@@ -190,7 +200,7 @@ artifact URIs remain metadata-only unless a storage connector is added.
 - Keep Postgres as the durable control plane.
 - Keep Redis out of durable state.
 - Keep UI/API as the canonical MoiraWeave interaction surface.
-- Treat Telegram, Slack, Discord, and webhooks as runtime-owned channels unless a project explicitly builds a MoiraWeave connector.
+- Treat Telegram, Slack, Discord, and webhooks as runtime-owned channels unless a project explicitly builds a MoiraWeave connector. MoiraWeave-owned connectors call `/v1/channels/{channel}/agents/{name}/messages`; webhook connectors can use the alias `/v1/webhooks/{channel}/agents/{name}/messages`.
 
 ## Further Reading
 

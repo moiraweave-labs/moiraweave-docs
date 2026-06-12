@@ -18,7 +18,9 @@ control plane for model services, pipelines, and agent runtimes.
 | Artifact | Metadata for files or outputs produced by a run | Workload produces, MoiraWeave indexes |
 | Environment | A deployment scope such as `local`, `dev`, `staging`, or `prod` | You choose, MoiraWeave records |
 | Audit event | Durable record of a sensitive platform action | MoiraWeave control plane |
-| API key | Hashed bearer credential for automation, scoped to a subject and role | Admin creates, MoiraWeave validates |
+| User | Persistent subject that can sign in through `/auth/token` | Admin creates, MoiraWeave validates |
+| Team | Grouping for operators and automation credentials | Admin creates, MoiraWeave records |
+| API key | Hashed bearer credential for automation, scoped to a subject, role, and optional team | Admin creates, MoiraWeave validates |
 
 ## Design Principles
 
@@ -31,10 +33,13 @@ control plane for model services, pipelines, and agent runtimes.
   workload health, and preflight can be filtered by environment so local tests do
   not hide production state.
 - Audit actions, not secrets: API key lifecycle, deploy operations, run cancellation, agent/channel messages, and artifact access are traceable without storing secret values.
+- Users and teams are product concepts: the demo admin is only a bootstrap path;
+  persistent users, teams, memberships, and team-scoped API keys live in
+  Postgres.
 - API keys are one-time secret values: the dashboard/API returns the `mwk_...`
   secret only when an admin creates it. After that, MoiraWeave stores metadata,
-  a hash, last-use timestamp, and revocation state. Rotating a key creates a
-  new one-time secret and revokes the old credential.
+  team scope, a hash, last-use timestamp, and revocation state. Rotating a key
+  creates a new one-time secret and revokes the old credential.
 - Secret names only: manifests declare required secret names, while values stay in
   `.env`, Kubernetes Secrets, or an external secret manager. The API, CLI, and
   UI show presence and missing names, never secret values.

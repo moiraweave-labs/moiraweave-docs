@@ -171,7 +171,9 @@ Runtime-specific details live in
 
 - `POST /v1/workloads/{name}/deployments`: record local, Kubernetes, or external deployment state for an environment.
 - `GET /v1/deployments`: list deployment records visible to the authenticated user, optionally filtered by workload and environment.
+- `GET /v1/environments`: summarize environment names and visible workload/deployment/operation counts.
 - `GET /v1/workloads/{name}/health`: summarize health from environment-scoped deployment state and probe deployment endpoints when present.
 - `POST /v1/channels/{channel}/agents/{name}/messages`: authenticated inbound channel bridge.
+- `POST /v1/webhooks/{channel}/agents/{name}/messages`: webhook-friendly alias of the authenticated inbound channel bridge.
 - `GET /v1/agents/{name}/sessions/{session_id}/health`: summarize a session and its latest run.
 - `GET /v1/audit-events`: list the authenticated subject's audit events, with filters for action and resource.

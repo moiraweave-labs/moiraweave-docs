@@ -55,10 +55,14 @@ Open `http://localhost:3000/agents`, then sign in with:
 admin / demo-password
 ```
 
-The local demo user has the `admin` role by default. For automation, open
+The local demo user has the `admin` role by default. Admins can create
+persistent users, teams, and team memberships from Security or through
+`/auth/users`, `/auth/teams`, and `/auth/teams/{team_id}/members`; persistent
+users sign in through the same `/auth/token` endpoint. For automation, open
 Security in the dashboard or call `POST /auth/api-keys` to create a hashed API
-key. Copy the returned `mwk_...` secret immediately; MoiraWeave stores only the
-hash, prefix, subject, role, timestamps, and revocation state in Postgres.
+key, optionally scoped to a team. Copy the returned `mwk_...` secret
+immediately; MoiraWeave stores only the hash, prefix, subject, role, team scope,
+timestamps, and revocation state in Postgres.
 Admins can rotate keys from Security or `POST /auth/api-keys/{key_id}/rotate`
 when automation credentials need replacement; the old key is revoked and the
 new secret is also shown once.

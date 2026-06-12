@@ -87,7 +87,9 @@ Every MoiraWeave-owned inbound channel must be declared in the workload
 manifest before MoiraWeave accepts messages for it. The API gateway normalizes
 channel names to lowercase and only accepts
 `/v1/channels/{channel}/agents/{name}/messages` when `channel` is listed in
-`spec.agent.exposedChannels`.
+`spec.agent.exposedChannels`. Webhook connector services can use the alias
+`/v1/webhooks/{channel}/agents/{name}/messages`; it follows the same auth,
+session, run, audit, and channel-ownership rules.
 
 Use `externalOwnedChannels` for integrations that the runtime owns itself. For
 example, if a Hermes profile already runs its own Telegram bridge, declare
