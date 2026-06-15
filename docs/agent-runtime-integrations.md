@@ -46,6 +46,21 @@ Hermes and OpenClaw can be deployed together as separate workloads. Their
 service names and ports must be unique, and each runtime should get its own
 workspace and token secret.
 
+## Compatibility Matrix
+
+| Runtime | Adapter | Protocol | Default endpoint | Required secrets | Health check | Cancellation | Artifact discovery | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Hermes Agent | `hermes` | HTTP JSON API | `http://hermes:8642` | `OPENAI_API_KEY`, optional `HERMES_API_SERVER_KEY` | `/health` for probes, `/health/detailed` for adapter status | `POST /v1/runs/{run_id}/stop` | `artifacts` returned by `GET /v1/runs/{run_id}` | Best fit for MoiraWeave because it exposes run ids, status, cancellation, and health over HTTP. |
+| OpenClaw Gateway | `openclaw` | WebSocket JSON-RPC v4 | `http://openclaw:18789` | optional `OPENCLAW_GATEWAY_TOKEN` | TCP probe plus Gateway `health` RPC | `sessions.abort` or `chat.abort` fallback | `artifacts.list` when supported by the gateway | Requires gateway/operator protocol support; MoiraWeave maps session ids to OpenClaw session keys. |
+| Generic HTTP Agent | `generic-http` | HTTP JSON | workload `spec.endpoint` or first declared port | workload-defined | `statusPath` or `/health` | `cancelPath` or `/cancel` | `artifactsPath` or `/artifacts` | Use for custom agents that expose simple message/status/cancel/artifact endpoints. |
+| External Hermes/OpenClaw | `hermes` or `openclaw` | Runtime-native remote endpoint | workload `spec.endpoint` | runtime-owned or referenced by `authTokenEnv` | adapter status call against remote endpoint | adapter-specific | adapter-specific | MoiraWeave records `target: external` and supervises the runtime, but does not deploy it. |
+
+Compatibility means MoiraWeave can dispatch a session message, correlate a run,
+poll or stream progress, request cancellation, discover artifacts, and report
+health. It does not mean MoiraWeave owns the runtime's tool permissions,
+provider keys, memory, browser process, terminal backend, MCP servers, or
+native messaging bridges.
+
 ## Tool Ownership
 
 Agent tools stay runtime-owned. MoiraWeave prepares the runtime boundary:
