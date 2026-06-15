@@ -49,6 +49,12 @@ docker-compose.yml
 The generated Compose stack includes API Gateway, worker, Postgres, Redis,
 Qdrant, and the Ops dashboard.
 
+Local semantic search is disabled by default so first-run startup does not
+download embedding models from external registries. To enable it, set
+`EMBEDDING_MODEL=BAAI/bge-small-en-v1.5` or another FastEmbed model in `.env`;
+the generated Compose file points Hugging Face/FastEmbed caches at writable
+temporary paths inside the API container.
+
 Open `http://localhost:3000/agents`, then sign in with:
 
 ```text
@@ -56,20 +62,40 @@ admin / demo-password
 ```
 
 The local demo user has the `admin` role by default. Admins can create
-persistent users, teams, and team memberships from Security or through
-`/auth/users`, `/auth/teams`, and `/auth/teams/{team_id}/members`; persistent
-users sign in through the same `/auth/token` endpoint. For automation, open
-Security in the dashboard or call `POST /auth/api-keys` to create a hashed API
-key, optionally scoped to a team. Copy the returned `mwk_...` secret
+persistent users, teams, and team memberships from Security or from the CLI:
+
+```bash
+moira security user create alice --role operator
+moira security team create agents "Agent Operators"
+moira security team add-member agents alice --role operator
+```
+
+Persistent users sign in through the same `/auth/token` endpoint. For
+automation, open Security in the dashboard or use
+`moira security api-key create` to create a hashed API key, optionally scoped to
+a team:
+
+```bash
+moira security api-key create "agent automation" alice --role operator --team-id agents
+```
+
+Copy the returned `mwk_...` secret
 immediately; MoiraWeave stores only the hash, prefix, subject, role, team scope,
 timestamps, and revocation state in Postgres.
-Admins can rotate keys from Security or `POST /auth/api-keys/{key_id}/rotate`
-when automation credentials need replacement; the old key is revoked and the
-new secret is also shown once.
+Admins can rotate keys from Security or `moira security api-key rotate <key_id>`
+when automation credentials need replacement; the old key is revoked and the new
+secret is also shown once.
 Static bootstrap keys are still supported through `MOIRA_API_KEYS` with
 comma-separated `key:subject:role` entries. The dashboard resolves the active
 credential with `GET /auth/me`, shows the current role in the header, and
 disables actions that need a higher role before they fail server-side.
+
+Check the active credential and environment summary from the terminal:
+
+```bash
+moira security me
+moira env list
+```
 
 For a terminal-only smoke test, use one command that creates a session when
 needed, sends the message, and watches the associated run:
