@@ -144,7 +144,9 @@ In the dashboard:
   deployment records, secrets, and runtime reachability so queued agent turns
   have an actionable cause. The readiness guide summarizes those checks as
   next commands such as setting missing secret names, syncing deployment records,
-  checking worker logs, or inspecting runtime logs.
+  checking worker logs, or inspecting runtime logs. The Command Companion next
+  to deployment metadata shows the exact local, Kubernetes, or external runtime
+  commands for the selected workload and environment.
 - Agents: the first agent and existing session are selected automatically; start
   the first session from the empty-state CTA, send a message, cancel/retry a
   turn, watch session health, and follow the exact linked run status even when

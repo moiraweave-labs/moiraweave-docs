@@ -134,7 +134,9 @@ compare created, deployed, reachable, and healthy state without mixing local and
 cluster records. Its deployment readiness guide uses the same product language
 as `moira doctor`: missing secrets, deployment records, worker dispatch, runtime
 reachability, Docker/Compose, and runtime boundary checks become concrete next
-commands while secret values remain outside MoiraWeave.
+commands while secret values remain outside MoiraWeave. The Command Companion
+also renders the exact local, Kubernetes, or external-runtime commands for the
+selected workload, target, and environment.
 
 API access uses bearer credentials. Local development can issue demo JWTs with
 `DEMO_USERNAME`, `DEMO_PASSWORD`, and `DEMO_ROLE`. Admins can create persistent

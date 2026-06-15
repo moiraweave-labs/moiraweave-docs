@@ -33,6 +33,11 @@
 		<span class="mw-card__title">Architecture</span>
 		<span class="mw-card__text">Review ownership boundaries, execution flow, and platform trade-offs.</span>
 	</a>
+	<a class="mw-card" href="architecture-benchmark/">
+		<span class="mw-card__kicker">Compare the boundary</span>
+		<span class="mw-card__title">Benchmark</span>
+		<span class="mw-card__text">See how MoiraWeave complements agent runtimes, builders, workflow engines, and serving stacks.</span>
+	</a>
 	<a class="mw-card" href="repo-structure/">
 		<span class="mw-card__kicker">Find the boundaries</span>
 		<span class="mw-card__title">Repository Structure</span>
