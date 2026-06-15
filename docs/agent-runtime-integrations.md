@@ -363,7 +363,8 @@ token. The variable value should be the name of the env var containing the
 token, for example `HERMES_API_SERVER_KEY`.
 
 Turn tests are intentionally gated by separate flags because they create real
-runtime work and may call external model providers:
+runtime work, may call external model providers, and also exercise adapter
+artifact discovery after the turn completes:
 
 ```bash
 MOIRAWEAVE_REAL_AGENT_TESTS=1 \
@@ -386,13 +387,34 @@ make test-real-agents
 `MOIRAWEAVE_REAL_AGENT_TURN_TIMEOUT_SECONDS` defaults to `120` and can be
 raised for slower long-running agent profiles.
 
+Cancellation tests are gated separately because they intentionally interrupt
+live runtime work:
+
+```bash
+MOIRAWEAVE_REAL_AGENT_TESTS=1 \
+MOIRAWEAVE_REAL_HERMES_URL=http://localhost:8642 \
+MOIRAWEAVE_REAL_HERMES_CANCEL_TEST=1 \
+make test-real-agents
+```
+
+For OpenClaw, use:
+
+```bash
+MOIRAWEAVE_REAL_AGENT_TESTS=1 \
+MOIRAWEAVE_REAL_OPENCLAW_URL=http://localhost:18789 \
+MOIRAWEAVE_REAL_OPENCLAW_AGENT_ID=main \
+MOIRAWEAVE_REAL_OPENCLAW_CANCEL_TEST=1 \
+make test-real-agents
+```
+
 The core repository also exposes a manual GitHub Actions workflow named
 `Live Agent Integrations`. It runs the same `make test-real-agents` target.
 Dispatch it with `hermes_url` and/or `openclaw_url`. If the runtimes require
 tokens, configure repository secrets named `HERMES_API_SERVER_KEY` and
 `OPENCLAW_GATEWAY_TOKEN`. The workflow runs health checks by default. Enable
 `hermes_turn_test` or `openclaw_turn_test` only when you want it to create real
-agent work.
+agent work. Enable `hermes_cancel_test` or `openclaw_cancel_test` only when you
+want the workflow to certify cooperative cancellation against a live runtime.
 
 ## Sources
 
