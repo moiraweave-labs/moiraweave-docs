@@ -134,7 +134,13 @@ compare created, deployed, reachable, and healthy state without mixing local and
 cluster records. Its deployment readiness guide uses the same product language
 as `moira doctor`: missing secrets, deployment records, worker dispatch, runtime
 reachability, Docker/Compose, and runtime boundary checks become concrete next
-commands while secret values remain outside MoiraWeave.
+commands while secret values remain outside MoiraWeave. The Command Companion
+also renders the exact local, Kubernetes, or external-runtime commands for the
+selected workload, target, and environment. For Kubernetes operations, the
+Controller Queue highlights queued/running controller work and gives operators
+the matching `moira deploy controller run --target kubernetes --env <env>
+--watch` command without exposing kubeconfig or deployment credentials to the
+browser.
 
 API access uses bearer credentials. Local development can issue demo JWTs with
 `DEMO_USERNAME`, `DEMO_PASSWORD`, and `DEMO_ROLE`. Admins can create persistent
@@ -159,7 +165,10 @@ Secret inventory is deliberately metadata-only. The API returns required names,
 presence, source, workload references, and remediation; it does not return
 values. Local values stay in `.env` or the process environment, Kubernetes
 values stay in Secrets or external secret managers, and the UI only displays
-whether each required name is present from the API gateway point of view.
+whether each required name is present from the API gateway point of view. When
+operators need cluster-level validation, `moira secrets list --target
+kubernetes` reads only Secret key names through `kubectl`; it does not decode or
+print Secret values.
 
 Audit events are stored in Postgres and scoped to the authenticated subject.
 The current trail records API key lifecycle changes, deployment records,
@@ -180,9 +189,33 @@ inventory, control-plane dependencies, and runtime reachability when a
 registered endpoint exists. Deployment operations are stored as a navigable
 history so operators can inspect plans, syncs, blocked applies/undeploys,
 generated commands, next actions, events, timestamps, and outcomes after the
-fact. The CLI is still required for workspace-local actions that need
-filesystem, Docker, Helm, or Kubernetes credentials: `moira init`, `moira up`,
-Compose/Helm generation, `deploy local --up`, `deploy k8s --apply`, logs, and
+fact.
+
+For Kubernetes, the API also exposes a controller contract for deployment
+operations. A UI request can create `apply` or `undeploy` with
+`executor: controller`, which stores the operation as `queued`. A deployment
+controller or CI worker can list queued operations, claim one, append execution
+events, and complete it as `succeeded`, `failed`, or `canceled`. Successful
+`apply` and `undeploy` completions update the environment-scoped deployment
+record for the original requesting user. The browser still never receives
+cluster credentials.
+
+The first executable implementation of that contract is the CLI controller:
+`moira deploy controller run --env dev --watch`. It is intended for an operator
+terminal, CI runner, secured automation worker, or the optional in-cluster
+controller. The CLI image `ghcr.io/moiraweave-labs/moiraweave-cli:latest`
+contains `moira`, Helm, and kubectl. The Helm chart can install it with
+`deploymentController.enabled=true`, using a separate ServiceAccount and
+namespace-scoped RBAC. The controller consumes an admin token from
+`moiraweave-controller-token`, fetches workload manifests from the API when no
+local workspace exists, applies the published OCI chart
+`oci://ghcr.io/moiraweave-labs/charts/moiraweave`, fetches workload logs, and
+deletes workload runtime resources by MoiraWeave labels while keeping kubeconfig
+outside the UI.
+
+The CLI is still required for workspace-local actions that need filesystem,
+Docker, Helm, or Kubernetes credentials: `moira init`, `moira up`, Compose/Helm
+generation, `deploy local --up`, `deploy k8s --apply`, logs, and manual
 undeploy-style operations. `moira doctor --json` exposes an `action_guide` so CI
 or setup scripts can consume the same readiness guidance shown to operators. The
 UI deliberately talks only to the API gateway and does not get direct access to

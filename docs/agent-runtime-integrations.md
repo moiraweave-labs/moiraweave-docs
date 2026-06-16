@@ -46,6 +46,21 @@ Hermes and OpenClaw can be deployed together as separate workloads. Their
 service names and ports must be unique, and each runtime should get its own
 workspace and token secret.
 
+## Compatibility Matrix
+
+| Runtime | Adapter | Protocol | Default endpoint | Required secrets | Health check | Cancellation | Artifact discovery | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Hermes Agent | `hermes` | HTTP JSON API | `http://hermes:8642` | `OPENAI_API_KEY`, optional `HERMES_API_SERVER_KEY` | `/health` for probes, `/health/detailed` for adapter status | `POST /v1/runs/{run_id}/stop` | `artifacts` returned by `GET /v1/runs/{run_id}` | Best fit for MoiraWeave because it exposes run ids, status, cancellation, and health over HTTP. |
+| OpenClaw Gateway | `openclaw` | WebSocket JSON-RPC v4 | `http://openclaw:18789` | optional `OPENCLAW_GATEWAY_TOKEN` | TCP probe plus Gateway `health` RPC | `sessions.abort` or `chat.abort` fallback | `artifacts.list` when supported by the gateway | Requires gateway/operator protocol support; MoiraWeave maps session ids to OpenClaw session keys. |
+| Generic HTTP Agent | `generic-http` | HTTP JSON | workload `spec.endpoint` or first declared port | workload-defined | `statusPath` or `/health` | `cancelPath` or `/cancel` | `artifactsPath` or `/artifacts` | Use for custom agents that expose simple message/status/cancel/artifact endpoints. |
+| External Hermes/OpenClaw | `hermes` or `openclaw` | Runtime-native remote endpoint | workload `spec.endpoint` | runtime-owned or referenced by `authTokenEnv` | adapter status call against remote endpoint | adapter-specific | adapter-specific | MoiraWeave records `target: external` and supervises the runtime, but does not deploy it. |
+
+Compatibility means MoiraWeave can dispatch a session message, correlate a run,
+poll or stream progress, request cancellation, discover artifacts, and report
+health. It does not mean MoiraWeave owns the runtime's tool permissions,
+provider keys, memory, browser process, terminal backend, MCP servers, or
+native messaging bridges.
+
 ## Tool Ownership
 
 Agent tools stay runtime-owned. MoiraWeave prepares the runtime boundary:
@@ -363,7 +378,8 @@ token. The variable value should be the name of the env var containing the
 token, for example `HERMES_API_SERVER_KEY`.
 
 Turn tests are intentionally gated by separate flags because they create real
-runtime work and may call external model providers:
+runtime work, may call external model providers, and also exercise adapter
+artifact discovery after the turn completes:
 
 ```bash
 MOIRAWEAVE_REAL_AGENT_TESTS=1 \
@@ -386,13 +402,34 @@ make test-real-agents
 `MOIRAWEAVE_REAL_AGENT_TURN_TIMEOUT_SECONDS` defaults to `120` and can be
 raised for slower long-running agent profiles.
 
+Cancellation tests are gated separately because they intentionally interrupt
+live runtime work:
+
+```bash
+MOIRAWEAVE_REAL_AGENT_TESTS=1 \
+MOIRAWEAVE_REAL_HERMES_URL=http://localhost:8642 \
+MOIRAWEAVE_REAL_HERMES_CANCEL_TEST=1 \
+make test-real-agents
+```
+
+For OpenClaw, use:
+
+```bash
+MOIRAWEAVE_REAL_AGENT_TESTS=1 \
+MOIRAWEAVE_REAL_OPENCLAW_URL=http://localhost:18789 \
+MOIRAWEAVE_REAL_OPENCLAW_AGENT_ID=main \
+MOIRAWEAVE_REAL_OPENCLAW_CANCEL_TEST=1 \
+make test-real-agents
+```
+
 The core repository also exposes a manual GitHub Actions workflow named
 `Live Agent Integrations`. It runs the same `make test-real-agents` target.
 Dispatch it with `hermes_url` and/or `openclaw_url`. If the runtimes require
 tokens, configure repository secrets named `HERMES_API_SERVER_KEY` and
 `OPENCLAW_GATEWAY_TOKEN`. The workflow runs health checks by default. Enable
 `hermes_turn_test` or `openclaw_turn_test` only when you want it to create real
-agent work.
+agent work. Enable `hermes_cancel_test` or `openclaw_cancel_test` only when you
+want the workflow to certify cooperative cancellation against a live runtime.
 
 ## Sources
 

@@ -49,6 +49,12 @@ docker-compose.yml
 The generated Compose stack includes API Gateway, worker, Postgres, Redis,
 Qdrant, and the Ops dashboard.
 
+Local semantic search is disabled by default so first-run startup does not
+download embedding models from external registries. To enable it, set
+`EMBEDDING_MODEL=BAAI/bge-small-en-v1.5` or another FastEmbed model in `.env`;
+the generated Compose file points Hugging Face/FastEmbed caches at writable
+temporary paths inside the API container.
+
 Open `http://localhost:3000/agents`, then sign in with:
 
 ```text
@@ -56,20 +62,40 @@ admin / demo-password
 ```
 
 The local demo user has the `admin` role by default. Admins can create
-persistent users, teams, and team memberships from Security or through
-`/auth/users`, `/auth/teams`, and `/auth/teams/{team_id}/members`; persistent
-users sign in through the same `/auth/token` endpoint. For automation, open
-Security in the dashboard or call `POST /auth/api-keys` to create a hashed API
-key, optionally scoped to a team. Copy the returned `mwk_...` secret
+persistent users, teams, and team memberships from Security or from the CLI:
+
+```bash
+moira security user create alice --role operator
+moira security team create agents "Agent Operators"
+moira security team add-member agents alice --role operator
+```
+
+Persistent users sign in through the same `/auth/token` endpoint. For
+automation, open Security in the dashboard or use
+`moira security api-key create` to create a hashed API key, optionally scoped to
+a team:
+
+```bash
+moira security api-key create "agent automation" alice --role operator --team-id agents
+```
+
+Copy the returned `mwk_...` secret
 immediately; MoiraWeave stores only the hash, prefix, subject, role, team scope,
 timestamps, and revocation state in Postgres.
-Admins can rotate keys from Security or `POST /auth/api-keys/{key_id}/rotate`
-when automation credentials need replacement; the old key is revoked and the
-new secret is also shown once.
+Admins can rotate keys from Security or `moira security api-key rotate <key_id>`
+when automation credentials need replacement; the old key is revoked and the new
+secret is also shown once.
 Static bootstrap keys are still supported through `MOIRA_API_KEYS` with
 comma-separated `key:subject:role` entries. The dashboard resolves the active
 credential with `GET /auth/me`, shows the current role in the header, and
 disables actions that need a higher role before they fail server-side.
+
+Check the active credential and environment summary from the terminal:
+
+```bash
+moira security me
+moira env list
+```
 
 For a terminal-only smoke test, use one command that creates a session when
 needed, sends the message, and watches the associated run:
@@ -118,7 +144,9 @@ In the dashboard:
   deployment records, secrets, and runtime reachability so queued agent turns
   have an actionable cause. The readiness guide summarizes those checks as
   next commands such as setting missing secret names, syncing deployment records,
-  checking worker logs, or inspecting runtime logs.
+  checking worker logs, or inspecting runtime logs. The Command Companion next
+  to deployment metadata shows the exact local, Kubernetes, or external runtime
+  commands for the selected workload and environment.
 - Agents: the first agent and existing session are selected automatically; start
   the first session from the empty-state CTA, send a message, cancel/retry a
   turn, watch session health, and follow the exact linked run status even when
@@ -171,14 +199,59 @@ Before starting the stack, inspect required names without exposing values:
 moira secrets list --workload hermes
 ```
 
+For Kubernetes deployments, verify Secret keys from the operator machine or CI
+runner that has `kubectl` access. Values remain in the cluster Secret or
+external secret manager:
+
+```bash
+moira secrets list --workload hermes --target kubernetes --env dev --kubernetes-secret moiraweave-secrets
+```
+
 ## CLI Boundaries
 
 The UI never talks directly to Docker, Kubernetes, Redis, or the filesystem.
 Local execution runs through `moira up`, `moira deploy local`, and Docker
 Compose. Kubernetes execution should run through CLI, CI, or a deployment
 controller/operator. Operations Center can request Apply, Logs, and Undeploy
-operations, but those operations return commands and next actions for the CLI or
-controller to execute; the browser does not receive deployment credentials.
+operations. Local/external operations return commands and next actions for the
+CLI or controller to execute. Kubernetes Apply/Undeploy requests are queued for
+a deployment controller when one is installed; the controller claims the
+operation, appends execution events, completes it, and syncs the deployment
+record. The browser does not receive deployment credentials. The Controller
+Queue in Operations Center shows queued/running controller work and the exact
+`moira deploy controller run` command for the selected target and environment.
+
+Run the CLI controller from an operator machine, CI runner, or secured
+automation environment that already has `MOIRA_TOKEN`, `helm`, and `kubectl`
+configured:
+
+```bash
+moira deploy controller run --env dev --watch
+```
+
+For long-lived Kubernetes environments, enable the in-cluster controller in the
+MoiraWeave Helm chart. Create a token secret first; use an admin API key or
+admin bearer token because the controller claims queued operations across users:
+
+```bash
+kubectl create secret generic moiraweave-controller-token \
+  --from-literal=MOIRA_TOKEN=<admin-api-token> \
+  --namespace moiraweave
+
+helm upgrade --install moiraweave oci://ghcr.io/moiraweave-labs/charts/moiraweave \
+  --namespace moiraweave --create-namespace \
+  --set deploymentController.enabled=true
+```
+
+The controller image is `ghcr.io/moiraweave-labs/moiraweave-cli:latest`. It
+includes `moira`, Helm, and kubectl. The chart creates a separate ServiceAccount,
+Role, RoleBinding, Deployment, and NetworkPolicy for the controller, so the UI
+still never receives kubeconfig or cluster credentials.
+
+The first executable controller supports Kubernetes `apply` through Helm,
+workload log collection through `kubectl logs`, and workload runtime deletion
+through Kubernetes labels. It intentionally runs outside the browser so cluster
+credentials stay with the operator process or in-cluster ServiceAccount.
 
 ## Troubleshooting
 
@@ -188,6 +261,8 @@ controller to execute; the browser does not receive deployment credentials.
 | `moira up` stops before Docker starts | `moira doctor` found a blocking local issue | Fix the ERROR rows from `moira doctor`, then rerun `moira up` |
 | `moira up` cannot start containers | Docker is stopped or the port is busy | Run `moira doctor`, start Docker, and check ports 8000/3000/5432/6379 |
 | `moira doctor` reports official images unavailable | GHCR images were pushed but package visibility is not public | In GitHub Packages, set `moiraweave/api-gateway`, `moiraweave/worker`, and `moiraweave-ui` to public, then rerun `moira doctor` |
+| Helm cannot pull the MoiraWeave chart | GHCR chart package is private or not published yet | Set `charts/moiraweave` package visibility to public, or use `deploymentController.chartRef` with a private registry login |
+| Deployment controller pod cannot claim operations | Missing or low-privilege `MOIRA_TOKEN` | Create `moiraweave-controller-token` with an admin token or API key |
 | `moira doctor` warns about transient registry failures | Registry/network timeout, 429, or temporary GHCR issue | Retry `moira up`; Docker may still pull the images. If it persists, login to the registry or override `MOIRAWEAVE_*_IMAGE` |
 | `moira doctor` reports custom images unavailable | The image is private, unpublished, or the registry login is missing | Publish/login to the registry or override `MOIRAWEAVE_*_IMAGE` in `.env` |
 | `moira up` reports missing environment variables | Required workload secrets are not available locally | Run `moira doctor` and follow the readiness guide, or run `moira secrets list`, then add missing names to `.env` or export them |
