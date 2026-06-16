@@ -165,7 +165,10 @@ Secret inventory is deliberately metadata-only. The API returns required names,
 presence, source, workload references, and remediation; it does not return
 values. Local values stay in `.env` or the process environment, Kubernetes
 values stay in Secrets or external secret managers, and the UI only displays
-whether each required name is present from the API gateway point of view.
+whether each required name is present from the API gateway point of view. When
+operators need cluster-level validation, `moira secrets list --target
+kubernetes` reads only Secret key names through `kubectl`; it does not decode or
+print Secret values.
 
 Audit events are stored in Postgres and scoped to the authenticated subject.
 The current trail records API key lifecycle changes, deployment records,

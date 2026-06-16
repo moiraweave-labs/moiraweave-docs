@@ -199,6 +199,14 @@ Before starting the stack, inspect required names without exposing values:
 moira secrets list --workload hermes
 ```
 
+For Kubernetes deployments, verify Secret keys from the operator machine or CI
+runner that has `kubectl` access. Values remain in the cluster Secret or
+external secret manager:
+
+```bash
+moira secrets list --workload hermes --target kubernetes --env dev --kubernetes-secret moiraweave-secrets
+```
+
 ## CLI Boundaries
 
 The UI never talks directly to Docker, Kubernetes, Redis, or the filesystem.
