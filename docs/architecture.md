@@ -193,6 +193,14 @@ events, and complete it as `succeeded`, `failed`, or `canceled`. Successful
 record for the original requesting user. The browser still never receives
 cluster credentials.
 
+The first executable implementation of that contract is the CLI controller:
+`moira deploy controller run --env dev --watch`. It is intended for an operator
+terminal, CI runner, or secured automation worker with `MOIRA_TOKEN`, Helm, and
+kubectl configured. It can apply generated Helm values, fetch workload logs, and
+delete workload runtime resources by MoiraWeave labels while keeping kubeconfig
+outside the UI. A long-lived in-cluster controller/operator can reuse the same
+API contract later.
+
 The CLI is still required for workspace-local actions that need filesystem,
 Docker, Helm, or Kubernetes credentials: `moira init`, `moira up`, Compose/Helm
 generation, `deploy local --up`, `deploy k8s --apply`, logs, and manual

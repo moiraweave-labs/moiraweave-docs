@@ -175,6 +175,9 @@ Runtime-specific details live in
 - `POST /v1/deployment-operations/{id}/claim`: deployment controller claims queued work.
 - `POST /v1/deployment-operations/{id}/events`: deployment controller appends execution output or status.
 - `POST /v1/deployment-operations/{id}/complete`: deployment controller marks work `succeeded`, `failed`, or `canceled`.
+
+The CLI command `moira deploy controller run --env dev --watch` implements this
+contract for Kubernetes environments from an operator-controlled process.
 - `GET /v1/environments`: summarize environment names and visible workload/deployment/operation counts.
 - `GET /v1/workloads/{name}/health`: summarize health from environment-scoped deployment state and probe deployment endpoints when present.
 - `POST /v1/channels/{channel}/agents/{name}/messages`: authenticated inbound channel bridge.

@@ -211,6 +211,19 @@ a deployment controller when one is installed; the controller claims the
 operation, appends execution events, completes it, and syncs the deployment
 record. The browser does not receive deployment credentials.
 
+Run the CLI controller from an operator machine, CI runner, or secured
+automation environment that already has `MOIRA_TOKEN`, `helm`, and `kubectl`
+configured:
+
+```bash
+moira deploy controller run --env dev --watch
+```
+
+The first executable controller supports Kubernetes `apply` through Helm,
+workload log collection through `kubectl logs`, and workload runtime deletion
+through Kubernetes labels. It intentionally runs outside the browser so
+kubeconfig and filesystem credentials stay with the operator process.
+
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
