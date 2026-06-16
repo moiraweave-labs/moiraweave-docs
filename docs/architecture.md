@@ -136,7 +136,11 @@ as `moira doctor`: missing secrets, deployment records, worker dispatch, runtime
 reachability, Docker/Compose, and runtime boundary checks become concrete next
 commands while secret values remain outside MoiraWeave. The Command Companion
 also renders the exact local, Kubernetes, or external-runtime commands for the
-selected workload, target, and environment.
+selected workload, target, and environment. For Kubernetes operations, the
+Controller Queue highlights queued/running controller work and gives operators
+the matching `moira deploy controller run --target kubernetes --env <env>
+--watch` command without exposing kubeconfig or deployment credentials to the
+browser.
 
 API access uses bearer credentials. Local development can issue demo JWTs with
 `DEMO_USERNAME`, `DEMO_PASSWORD`, and `DEMO_ROLE`. Admins can create persistent

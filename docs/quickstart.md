@@ -209,7 +209,9 @@ operations. Local/external operations return commands and next actions for the
 CLI or controller to execute. Kubernetes Apply/Undeploy requests are queued for
 a deployment controller when one is installed; the controller claims the
 operation, appends execution events, completes it, and syncs the deployment
-record. The browser does not receive deployment credentials.
+record. The browser does not receive deployment credentials. The Controller
+Queue in Operations Center shows queued/running controller work and the exact
+`moira deploy controller run` command for the selected target and environment.
 
 Run the CLI controller from an operator machine, CI runner, or secured
 automation environment that already has `MOIRA_TOKEN`, `helm`, and `kubectl`
