@@ -205,8 +205,11 @@ The UI never talks directly to Docker, Kubernetes, Redis, or the filesystem.
 Local execution runs through `moira up`, `moira deploy local`, and Docker
 Compose. Kubernetes execution should run through CLI, CI, or a deployment
 controller/operator. Operations Center can request Apply, Logs, and Undeploy
-operations, but those operations return commands and next actions for the CLI or
-controller to execute; the browser does not receive deployment credentials.
+operations. Local/external operations return commands and next actions for the
+CLI or controller to execute. Kubernetes Apply/Undeploy requests are queued for
+a deployment controller when one is installed; the controller claims the
+operation, appends execution events, completes it, and syncs the deployment
+record. The browser does not receive deployment credentials.
 
 ## Troubleshooting
 

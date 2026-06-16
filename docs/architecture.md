@@ -182,9 +182,20 @@ inventory, control-plane dependencies, and runtime reachability when a
 registered endpoint exists. Deployment operations are stored as a navigable
 history so operators can inspect plans, syncs, blocked applies/undeploys,
 generated commands, next actions, events, timestamps, and outcomes after the
-fact. The CLI is still required for workspace-local actions that need
-filesystem, Docker, Helm, or Kubernetes credentials: `moira init`, `moira up`,
-Compose/Helm generation, `deploy local --up`, `deploy k8s --apply`, logs, and
+fact.
+
+For Kubernetes, the API also exposes a controller contract for deployment
+operations. A UI request can create `apply` or `undeploy` with
+`executor: controller`, which stores the operation as `queued`. A deployment
+controller or CI worker can list queued operations, claim one, append execution
+events, and complete it as `succeeded`, `failed`, or `canceled`. Successful
+`apply` and `undeploy` completions update the environment-scoped deployment
+record for the original requesting user. The browser still never receives
+cluster credentials.
+
+The CLI is still required for workspace-local actions that need filesystem,
+Docker, Helm, or Kubernetes credentials: `moira init`, `moira up`, Compose/Helm
+generation, `deploy local --up`, `deploy k8s --apply`, logs, and manual
 undeploy-style operations. `moira doctor --json` exposes an `action_guide` so CI
 or setup scripts can consume the same readiness guidance shown to operators. The
 UI deliberately talks only to the API gateway and does not get direct access to
