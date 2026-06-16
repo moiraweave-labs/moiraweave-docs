@@ -1,29 +1,67 @@
 # Architecture Benchmark
 
-Date: 2026-05-15
+Date: 2026-06-15
 
-This page compares MoiraWeave with established projects to make the design choices explicit and to identify the next documentation gaps.
+This page explains where MoiraWeave fits among adjacent systems. The goal is
+not to claim MoiraWeave replaces agent frameworks, workflow engines, or model
+serving platforms. The product boundary is narrower: MoiraWeave is the
+self-hosted control plane that deploys, connects, observes, and operates AI
+workloads.
 
-## Decision matrix
+## Positioning
 
-| Area | MoiraWeave today | Reference pattern | Gap | Next improvement |
-| --- | --- | --- | --- | --- |
-| Step contract | KServe-style I/O and metadata endpoints in step services | KServe V2 Inference Protocol: https://kserve.github.io/website/modelserving/data_plane/v2_protocol/ | Endpoint shape is aligned, but the compliance story is not visible in docs | Add protocol-level contract tests and document expected request/response shapes |
-| Pipeline composition | Declarative YAML plus runtime routing | Seldon Core 2 graphs: https://docs.seldon.ai/seldon-core-2 | The composition model is clear, but failure and retry semantics need more detail | Document backoff, retries, and step-level failure handling |
-| Modular serving | Per-step deployability through a shared runtime | Ray Serve composition patterns: https://docs.ray.io/en/latest/serve/ | Modular by design, but the operational guidance is thinner than the platform story | Add deployment guidance for scaling and rollout scenarios |
-| API runtime | FastAPI gateway with readiness and job lifecycle endpoints | FastAPI deployment docs: https://fastapi.tiangolo.com/deployment/ | Runtime foundations are solid; onboarding was previously fragmented | Keep the first-run path centralized in the quickstart |
-| GitOps | ArgoCD app-of-apps and environment sync modes | ArgoCD docs: https://argo-cd.readthedocs.io/ | Pattern is in place; troubleshooting guidance should be easier to find | Link troubleshooting and runbooks from the main entry points |
-| Progressive delivery | Argo Rollouts canary analysis | Argo Rollouts docs: https://argo-rollouts.readthedocs.io/ | Strategy exists, but success criteria are not yet documented as a decision table | Add canary thresholds and rollback criteria per environment |
-| Packaging | Helm chart-driven deployment with overlays | Helm chart best practices: https://helm.sh/docs/chart_best_practices/ | Overall structure is aligned; the model is now generic | Keep the chart generic and avoid domain-specific defaults |
+| Area | MoiraWeave role | Reference pattern | Product stance |
+| --- | --- | --- | --- |
+| Agent runtime | Deploy and supervise Hermes, OpenClaw, LangGraph, or custom HTTP agents | LangGraph/LangSmith | MoiraWeave does not own the reasoning loop, memory, tools, or policy engine inside the agent. It owns deployment records, sessions, messages, runs, events, artifacts, health, cancellation, and audit. |
+| Visual app building | Template-guided workload creation and Ops dashboard | Dify | MoiraWeave should stay ops-first. It can offer guided templates and YAML advanced mode, but it should not become a general visual agent builder. |
+| Durable workflow execution | Run state, heartbeat, cancellation, stale recovery, and Redis pending reclaim | Temporal | MoiraWeave borrows durable-operation patterns, but it should not recreate a full workflow engine. Pipelines remain workload-level orchestration that calls other workloads. |
+| Model serving | Generic `model-service` workloads and endpoints | Ray Serve, KServe | MoiraWeave deploys and calls model services through the same workload model, but specialized serving stacks keep ownership of scaling internals and protocol depth. |
+| Local-first deployment | `moira up`, Compose generation, UI, demo agent, local artifacts | Docker Compose | First use should be almost instant and require no external model provider. |
+| Kubernetes operations | Helm values, deployment records, preflight, monitoring, and optional controller boundary | Helm, ArgoCD | The browser never receives kubeconfig. Apply/log/undeploy run through CLI, CI, GitOps, or the optional in-cluster controller. |
+| Team operations | Users, teams, API keys, roles, audit, secret inventory | Internal platform consoles | MoiraWeave should expose enough governance for small teams without becoming a full IAM or secret manager. |
 
-## Adoption verdict
+## Competitive Gaps To Respect
 
-- Adopted: KServe-style contracts, ArgoCD, Argo Rollouts, Helm packaging.
-- Adapted: the pipeline router and job model to fit an async Redis-based runtime.
-- Deferred: strict protocol conformance tests and more detailed rollout policy documentation.
+- LangGraph/LangSmith is stronger for building and debugging agent graphs.
+  MoiraWeave should integrate those runtimes instead of competing with their
+  graph semantics.
+- Dify is stronger for no-code application creation. MoiraWeave should keep the
+  UI focused on operations: create from template, deploy/connect, chat, observe,
+  diagnose, and recover.
+- Temporal is stronger for arbitrary long-running workflows. MoiraWeave should
+  keep durable run semantics scoped to AI workloads and agent turns.
+- Ray Serve and KServe are stronger for high-scale inference serving internals.
+  MoiraWeave should provide a consistent deployment and operations surface for
+  model-service workloads.
 
-## Priority follow-ups
+## Current Strengths
 
-1. Add conformance tests for the step I/O protocol.
-2. Document retry and failure semantics in pipeline execution.
-3. Add canary thresholds and rollback criteria in one operational table.
+- One workload manifest drives local Compose, Kubernetes values, API
+  registration, preflight, and worker execution.
+- `moira up` gives an empty workspace a working platform, UI, and demo agent.
+- The UI can create workloads from templates, chat with agents, inspect linked
+  runs/events/artifacts, run preflight, and manage deployment records.
+- Long-running agents are modeled with heartbeats, stale-run detection,
+  cooperative cancellation, and safe Redis pending-message recovery.
+- Hermes/OpenClaw-style tools stay inside the runtime boundary. MoiraWeave
+  declares and displays the capability boundary without reimplementing web
+  search, browser control, terminal access, MCP servers, or native messaging.
+- GHCR image builds, CLI controller image builds, Helm chart publishing, and
+  public pull smoke tests are automated through GitHub Actions.
+
+## Priority Follow-Ups
+
+1. Certify real Hermes and OpenClaw integration with optional E2E runs gated by
+   `MOIRAWEAVE_REAL_AGENT_TESTS=1`, including startup, session message, events,
+   cancellation, artifacts, and failure diagnostics.
+2. Expand Operations Center into a release dashboard: environment comparison,
+   last operation, preflight status, runtime health, and recommended next action
+   per workload.
+3. Add policy metadata for agent capabilities: network egress, browser,
+   terminal, filesystem/workspace, MCP, native channels, and max runtime.
+4. Add production-grade secret inventory integrations beyond local environment
+   checks: Kubernetes Secrets, External Secrets Operator, and external-owned
+   secret references.
+5. Publish a real-agent compatibility matrix with runtime versions, required
+   ports, secrets, health endpoints, adapter paths, supported channels, and known
+   limitations.

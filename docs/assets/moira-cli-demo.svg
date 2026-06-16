@@ -6,11 +6,11 @@
   <text x="56" y="140" font-family="monospace" font-size="20" fill="#e2e8f0">│     MoiraWeave Init      │</text>
   <text x="56" y="168" font-family="monospace" font-size="20" fill="#e2e8f0">╰──────────────────────────╯</text>
   <text x="56" y="214" font-family="monospace" font-size="20" fill="#22c55e">Created moiraweave.yaml and .env</text>
-  <text x="56" y="264" font-family="monospace" font-size="20" fill="#94a3b8">$ moira task list</text>
-  <text x="56" y="304" font-family="monospace" font-size="18" fill="#e2e8f0">audio-transcribe   Transcribes audio content into text</text>
-  <text x="56" y="334" font-family="monospace" font-size="18" fill="#e2e8f0">text-embed         Encodes text into a dense vector embedding</text>
-  <text x="56" y="364" font-family="monospace" font-size="18" fill="#e2e8f0">vision-embedding   Encodes an image into dense vector tensor</text>
-  <text x="56" y="414" font-family="monospace" font-size="20" fill="#94a3b8">$ moira pipeline validate image-search</text>
-  <text x="56" y="454" font-family="monospace" font-size="20" fill="#22c55e">Pipeline 'image-search' is valid</text>
+  <text x="56" y="264" font-family="monospace" font-size="20" fill="#94a3b8">$ moira workload new hermes --type agent-service --adapter hermes</text>
+  <text x="56" y="304" font-family="monospace" font-size="18" fill="#e2e8f0">Created .moiraweave/workloads/hermes/workload.yaml</text>
+  <text x="56" y="354" font-family="monospace" font-size="20" fill="#94a3b8">$ moira deploy local</text>
+  <text x="56" y="394" font-family="monospace" font-size="18" fill="#e2e8f0">Generated .moiraweave/deploy/docker-compose.workloads.yml</text>
+  <text x="56" y="444" font-family="monospace" font-size="20" fill="#94a3b8">$ moira agent session create hermes</text>
+  <text x="56" y="484" font-family="monospace" font-size="20" fill="#22c55e">Agent session created</text>
   <text x="56" y="524" font-family="monospace" font-size="18" fill="#facc15">Snapshot generated for README docs.</text>
 </svg>
