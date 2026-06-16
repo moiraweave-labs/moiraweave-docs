@@ -17,7 +17,7 @@ workloads.
 | Durable workflow execution | Run state, heartbeat, cancellation, stale recovery, and Redis pending reclaim | Temporal | MoiraWeave borrows durable-operation patterns, but it should not recreate a full workflow engine. Pipelines remain workload-level orchestration that calls other workloads. |
 | Model serving | Generic `model-service` workloads and endpoints | Ray Serve, KServe | MoiraWeave deploys and calls model services through the same workload model, but specialized serving stacks keep ownership of scaling internals and protocol depth. |
 | Local-first deployment | `moira up`, Compose generation, UI, demo agent, local artifacts | Docker Compose | First use should be almost instant and require no external model provider. |
-| Kubernetes operations | Helm values, deployment records, preflight, monitoring, and optional controller boundary | Helm, ArgoCD | The browser never receives kubeconfig. Apply/log/undeploy should run through CLI, CI, GitOps, or a future controller. |
+| Kubernetes operations | Helm values, deployment records, preflight, monitoring, and optional controller boundary | Helm, ArgoCD | The browser never receives kubeconfig. Apply/log/undeploy run through CLI, CI, GitOps, or the optional in-cluster controller. |
 | Team operations | Users, teams, API keys, roles, audit, secret inventory | Internal platform consoles | MoiraWeave should expose enough governance for small teams without becoming a full IAM or secret manager. |
 
 ## Competitive Gaps To Respect
@@ -46,25 +46,22 @@ workloads.
 - Hermes/OpenClaw-style tools stay inside the runtime boundary. MoiraWeave
   declares and displays the capability boundary without reimplementing web
   search, browser control, terminal access, MCP servers, or native messaging.
-- GHCR image builds and public pull smoke tests are automated through GitHub
-  Actions.
+- GHCR image builds, CLI controller image builds, Helm chart publishing, and
+  public pull smoke tests are automated through GitHub Actions.
 
 ## Priority Follow-Ups
 
 1. Certify real Hermes and OpenClaw integration with optional E2E runs gated by
    `MOIRAWEAVE_REAL_AGENT_TESTS=1`, including startup, session message, events,
    cancellation, artifacts, and failure diagnostics.
-2. Add a Kubernetes deployment controller/operator contract for apply, logs,
-   and undeploy so the UI can trigger operations without receiving cluster
-   credentials.
-3. Expand Operations Center into a release dashboard: environment comparison,
+2. Expand Operations Center into a release dashboard: environment comparison,
    last operation, preflight status, runtime health, and recommended next action
    per workload.
-4. Add policy metadata for agent capabilities: network egress, browser,
+3. Add policy metadata for agent capabilities: network egress, browser,
    terminal, filesystem/workspace, MCP, native channels, and max runtime.
-5. Add production-grade secret inventory integrations beyond local environment
+4. Add production-grade secret inventory integrations beyond local environment
    checks: Kubernetes Secrets, External Secrets Operator, and external-owned
    secret references.
-6. Publish a real-agent compatibility matrix with runtime versions, required
+5. Publish a real-agent compatibility matrix with runtime versions, required
    ports, secrets, health endpoints, adapter paths, supported channels, and known
    limitations.

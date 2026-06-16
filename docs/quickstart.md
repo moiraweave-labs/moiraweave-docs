@@ -229,10 +229,29 @@ configured:
 moira deploy controller run --env dev --watch
 ```
 
+For long-lived Kubernetes environments, enable the in-cluster controller in the
+MoiraWeave Helm chart. Create a token secret first; use an admin API key or
+admin bearer token because the controller claims queued operations across users:
+
+```bash
+kubectl create secret generic moiraweave-controller-token \
+  --from-literal=MOIRA_TOKEN=<admin-api-token> \
+  --namespace moiraweave
+
+helm upgrade --install moiraweave oci://ghcr.io/moiraweave-labs/charts/moiraweave \
+  --namespace moiraweave --create-namespace \
+  --set deploymentController.enabled=true
+```
+
+The controller image is `ghcr.io/moiraweave-labs/moiraweave-cli:latest`. It
+includes `moira`, Helm, and kubectl. The chart creates a separate ServiceAccount,
+Role, RoleBinding, Deployment, and NetworkPolicy for the controller, so the UI
+still never receives kubeconfig or cluster credentials.
+
 The first executable controller supports Kubernetes `apply` through Helm,
 workload log collection through `kubectl logs`, and workload runtime deletion
-through Kubernetes labels. It intentionally runs outside the browser so
-kubeconfig and filesystem credentials stay with the operator process.
+through Kubernetes labels. It intentionally runs outside the browser so cluster
+credentials stay with the operator process or in-cluster ServiceAccount.
 
 ## Troubleshooting
 
@@ -242,6 +261,8 @@ kubeconfig and filesystem credentials stay with the operator process.
 | `moira up` stops before Docker starts | `moira doctor` found a blocking local issue | Fix the ERROR rows from `moira doctor`, then rerun `moira up` |
 | `moira up` cannot start containers | Docker is stopped or the port is busy | Run `moira doctor`, start Docker, and check ports 8000/3000/5432/6379 |
 | `moira doctor` reports official images unavailable | GHCR images were pushed but package visibility is not public | In GitHub Packages, set `moiraweave/api-gateway`, `moiraweave/worker`, and `moiraweave-ui` to public, then rerun `moira doctor` |
+| Helm cannot pull the MoiraWeave chart | GHCR chart package is private or not published yet | Set `charts/moiraweave` package visibility to public, or use `deploymentController.chartRef` with a private registry login |
+| Deployment controller pod cannot claim operations | Missing or low-privilege `MOIRA_TOKEN` | Create `moiraweave-controller-token` with an admin token or API key |
 | `moira doctor` warns about transient registry failures | Registry/network timeout, 429, or temporary GHCR issue | Retry `moira up`; Docker may still pull the images. If it persists, login to the registry or override `MOIRAWEAVE_*_IMAGE` |
 | `moira doctor` reports custom images unavailable | The image is private, unpublished, or the registry login is missing | Publish/login to the registry or override `MOIRAWEAVE_*_IMAGE` in `.env` |
 | `moira up` reports missing environment variables | Required workload secrets are not available locally | Run `moira doctor` and follow the readiness guide, or run `moira secrets list`, then add missing names to `.env` or export them |

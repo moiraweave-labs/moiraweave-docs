@@ -177,7 +177,10 @@ Runtime-specific details live in
 - `POST /v1/deployment-operations/{id}/complete`: deployment controller marks work `succeeded`, `failed`, or `canceled`.
 
 The CLI command `moira deploy controller run --env dev --watch` implements this
-contract for Kubernetes environments from an operator-controlled process.
+contract for Kubernetes environments from an operator-controlled process. The
+same executable is published as `ghcr.io/moiraweave-labs/moiraweave-cli:latest`
+and can run as the optional Helm-managed in-cluster deployment controller with
+`deploymentController.enabled=true`.
 - `GET /v1/environments`: summarize environment names and visible workload/deployment/operation counts.
 - `GET /v1/workloads/{name}/health`: summarize health from environment-scoped deployment state and probe deployment endpoints when present.
 - `POST /v1/channels/{channel}/agents/{name}/messages`: authenticated inbound channel bridge.
