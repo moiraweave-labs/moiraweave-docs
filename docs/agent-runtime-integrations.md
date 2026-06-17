@@ -102,8 +102,10 @@ Every MoiraWeave-owned inbound channel must be declared in the workload
 manifest before MoiraWeave accepts messages for it. The API gateway normalizes
 channel names to lowercase and only accepts
 `/v1/channels/{channel}/agents/{name}/messages` when `channel` is listed in
-`spec.agent.exposedChannels`. Webhook connector services can use the alias
-`/v1/webhooks/{channel}/agents/{name}/messages`; it follows the same auth,
+`spec.agent.exposedChannels`. Webhook connector services can use
+`/v1/webhooks/{channel}/agents/{name}/messages` without bearer auth, but they
+must sign the raw JSON body with `WEBHOOK_SIGNING_SECRET` and send
+`X-MoiraWeave-Signature: sha256=<hmac>`. Signed webhooks still follow the same
 session, run, audit, and channel-ownership rules.
 
 Use `externalOwnedChannels` for integrations that the runtime owns itself. For

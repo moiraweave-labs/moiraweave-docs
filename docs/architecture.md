@@ -43,8 +43,8 @@ Transient executor failures are retried with bounded backoff inside the workload
 timeout, and duplicate dispatch messages for already-active runs are acknowledged
 without re-running the agent action. Malformed or unrecoverable dispatch
 messages go to the Redis dead-letter stream; operators can inspect and purge
-them through the API or `moira run dead-letter list|purge` without connecting to
-Redis directly.
+them through the API or `moira run dead-letter list|replay|purge` without
+connecting to Redis directly.
 
 ## Agent Flow
 
@@ -156,13 +156,15 @@ browser.
 
 API access uses bearer credentials. Local development can issue demo JWTs when
 `DEMO_AUTH_ENABLED=true` with `DEMO_USERNAME`, `DEMO_PASSWORD`, and
-`DEMO_ROLE`; staging and production overlays disable this bootstrap path.
-Admins can create persistent users through `/auth/users`, teams through
-`/auth/teams`, and team memberships through `/auth/teams/{team_id}/members`;
-persistent users authenticate through the same `/auth/token` endpoint with
-PBKDF2-hashed passwords stored in Postgres. Automation should use hashed API
-keys created by an admin through the Security screen or `/auth/api-keys`; keys
-can optionally be scoped to a team.
+`DEMO_ROLE`; staging and production should disable demo auth. When demo auth is
+disabled and no persistent admin exists, `POST /auth/bootstrap/admin` or
+`moira security bootstrap-admin` creates the first admin and then closes that
+bootstrap path. Admins can create persistent users through `/auth/users`, teams
+through `/auth/teams`, and team memberships through
+`/auth/teams/{team_id}/members`; persistent users authenticate through the same
+`/auth/token` endpoint with PBKDF2-hashed passwords stored in Postgres.
+Automation should use hashed API keys created by an admin through the Security
+screen or `/auth/api-keys`; keys can optionally be scoped to a team.
 The secret is shown once, then only metadata, team scope, hash, last-use
 timestamp, and revocation state remain in Postgres. Existing keys can be rotated
 with `POST /auth/api-keys/{key_id}/rotate`, which returns a new one-time secret,
@@ -247,7 +249,12 @@ artifact URIs remain metadata-only unless a storage connector is added.
 - Keep Postgres as the durable control plane.
 - Keep Redis out of durable state.
 - Keep UI/API as the canonical MoiraWeave interaction surface.
-- Treat Telegram, Slack, Discord, and webhooks as runtime-owned channels unless a project explicitly builds a MoiraWeave connector. MoiraWeave-owned connectors call `/v1/channels/{channel}/agents/{name}/messages`; webhook connectors can use the alias `/v1/webhooks/{channel}/agents/{name}/messages`.
+- Treat Telegram, Slack, Discord, and webhooks as runtime-owned channels unless
+  a project explicitly builds a MoiraWeave connector. MoiraWeave-owned
+  authenticated connectors call `/v1/channels/{channel}/agents/{name}/messages`;
+  external webhook connectors call
+  `/v1/webhooks/{channel}/agents/{name}/messages` with
+  `X-MoiraWeave-Signature: sha256=<hmac>`.
 
 ## Further Reading
 

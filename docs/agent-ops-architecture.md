@@ -184,6 +184,7 @@ and can run as the optional Helm-managed in-cluster deployment controller with
 - `GET /v1/environments`: summarize environment names and visible workload/deployment/operation counts.
 - `GET /v1/workloads/{name}/health`: summarize health from environment-scoped deployment state and probe deployment endpoints when present.
 - `POST /v1/channels/{channel}/agents/{name}/messages`: authenticated inbound channel bridge.
-- `POST /v1/webhooks/{channel}/agents/{name}/messages`: webhook-friendly alias of the authenticated inbound channel bridge.
+- `POST /v1/webhooks/{channel}/agents/{name}/messages`: signed inbound webhook
+  bridge using `X-MoiraWeave-Signature: sha256=<hmac>`.
 - `GET /v1/agents/{name}/sessions/{session_id}/health`: summarize a session and its latest run.
 - `GET /v1/audit-events`: list the authenticated subject's audit events, with filters for action and resource.

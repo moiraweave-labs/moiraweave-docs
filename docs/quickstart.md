@@ -70,6 +70,18 @@ moira security team create agents "Agent Operators"
 moira security team add-member agents alice --role operator
 ```
 
+For staging or production, turn demo auth off and bootstrap the first admin
+once:
+
+```bash
+export DEMO_AUTH_ENABLED=false
+moira security bootstrap-admin owner --password '<strong-password>'
+```
+
+After a persistent admin exists, the bootstrap endpoint refuses new admins.
+Use Security or `moira security user password-reset`, `moira security user
+enable`, and `moira security user update` for normal user administration.
+
 Persistent users sign in through the same `/auth/token` endpoint. For
 automation, open Security in the dashboard or use
 `moira security api-key create` to create a hashed API key, optionally scoped to
@@ -268,7 +280,7 @@ credentials stay with the operator process or in-cluster ServiceAccount.
 | `moira up` reports missing environment variables | Required workload secrets are not available locally | Run `moira doctor` and follow the readiness guide, or run `moira secrets list`, then add missing names to `.env` or export them |
 | Login fails | Local demo auth is disabled or the password was overridden | Check `DEMO_AUTH_ENABLED`, `DEMO_USERNAME`, and `DEMO_PASSWORD` in `.env`; use a persistent user in staging/prod |
 | API request returns `403` | The token role is too limited | Use an `operator` or `admin` token for mutating actions |
-| Runs never start and dead-letter count grows | Worker cannot parse or resolve dispatch messages | Run `moira run dead-letter list`; inspect the reason, then purge fixed entries with `moira run dead-letter purge <message-id>` |
+| Runs never start and dead-letter count grows | Worker cannot parse or resolve dispatch messages | Run `moira run dead-letter list`; inspect the reason, fix the root cause, then use `moira run dead-letter replay <message-id>` or purge with `moira run dead-letter purge <message-id>` |
 | Workload is created but not healthy | Runtime service is missing or not reachable | Use Operations preflight and workload logs |
 | Production looks healthy because local is running | Operations is filtered to the wrong environment | Switch the environment selector to `prod` and rerun preflight |
 | A teammate changed/canceled/accessed something | Audit trail is needed | Query `/v1/audit-events` with `action`, `resource_type`, or `resource_id` filters |

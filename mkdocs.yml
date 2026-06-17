@@ -75,6 +75,7 @@ nav:
   - Getting Started:
       - Quickstart: quickstart.md
       - Concepts: concepts.md
+      - Security Hardening: security-hardening.md
   - Architecture:
       - Overview: architecture.md
       - Agent Operations: agent-ops-architecture.md
