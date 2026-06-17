@@ -110,6 +110,15 @@ The API `/ready` response also reports `run_queue` state, including the Redis
 stream, worker consumer group, attached consumers, pending count, and lag when
 available.
 
+The worker publishes operational counters for long-running workload recovery:
+
+| Metric | Labels | Meaning |
+| --- | --- | --- |
+| `moiraweave_worker_dead_letter_total` | `reason` | Dispatch messages moved to the dead-letter stream. |
+| `moiraweave_worker_pending_reclaim_messages_total` | `outcome` | Pending Redis Stream messages inspected by reclaim. |
+| `moiraweave_worker_run_retry_total` | `workload` | Retry attempts scheduled after transient executor failures. |
+| `moiraweave_worker_stale_run_lost_total` | none | Runs marked `lost` after stale worker heartbeat. |
+
 Useful checks after a cluster install:
 
 ```bash
