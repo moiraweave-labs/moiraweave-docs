@@ -187,9 +187,9 @@ kubernetes` reads only Secret key names through `kubectl`; it does not decode or
 print Secret values.
 
 Audit events are stored in Postgres and scoped to the authenticated subject.
-The current trail records API key lifecycle changes, deployment records,
-deployment operations, run cancellation, agent messages, channel ingress
-messages, artifact previews, and artifact downloads. These records are
+The current trail records login attempts, API key lifecycle changes, secret
+inventory reads, deployment records, deployment operations, run cancellation,
+agent messages, channel ingress messages, artifact previews, and artifact downloads. These records are
 operational breadcrumbs for teams: who asked MoiraWeave to do something
 sensitive, against which resource, and with which non-secret metadata. They are
 available through `GET /v1/audit-events`; the UI can surface them without direct

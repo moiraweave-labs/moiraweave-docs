@@ -31,6 +31,10 @@ moira security user disable alice
 moira security user enable alice
 ```
 
+Successful and failed password logins are audited as `auth.login.succeeded` and
+`auth.login.failed`. Audit metadata includes credential type and client host when
+available, but never passwords or tokens.
+
 ## API Keys And Teams
 
 Use persistent API keys for automation instead of sharing user passwords:
@@ -64,6 +68,9 @@ Use the inventory to verify presence without revealing values:
 ```bash
 moira secrets list
 ```
+
+Secret inventory reads are audited as `secret_inventory.read`. The audit event
+stores required secret names, total count, and missing count only.
 
 ## Signed Webhooks
 
