@@ -105,11 +105,18 @@ logs, and undeploy operations, use one of these executor paths:
 Production Helm values should set:
 
 - `demoAuth.enabled=false`
-- controller token Secret when the deployment controller is enabled
+- controller token Secret when the deployment controller is enabled; Helm fails
+  template rendering if `deploymentController.auth.existingSecret` or
+  `deploymentController.auth.tokenKey` is empty
 - NetworkPolicy for API, worker, Redis, Postgres, Qdrant, UI, and workloads
 - resource requests and limits
 - probes for API, worker, UI, and workloads
 - persistent artifact storage with backups
+
+Deployment controller operations store `controller_id`, `heartbeat_at`, and
+`lease_expires_at` in Postgres. Treat expired leases as operational incidents:
+restart the controller, check its logs, then let a healthy controller reclaim the
+operation rather than editing Redis/Postgres manually.
 
 ## Backups
 

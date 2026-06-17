@@ -264,6 +264,10 @@ The first executable controller supports Kubernetes `apply` through Helm,
 workload log collection through `kubectl logs`, and workload runtime deletion
 through Kubernetes labels. It intentionally runs outside the browser so cluster
 credentials stay with the operator process or in-cluster ServiceAccount.
+While running, it claims operations, sends heartbeats, refreshes a lease, and
+stores stdout/stderr summaries when completing the operation. If the lease
+expires, Operations Center shows a critical alert and another healthy controller
+can reclaim the operation.
 
 ## Troubleshooting
 

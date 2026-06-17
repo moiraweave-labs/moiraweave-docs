@@ -172,15 +172,18 @@ Runtime-specific details live in
 - `POST /v1/workloads/{name}/deployments`: record local, Kubernetes, or external deployment state for an environment.
 - `GET /v1/deployments`: list deployment records visible to the authenticated user, optionally filtered by workload and environment.
 - `POST /v1/deployment-operations`: plan, sync, log, apply, or undeploy a workload. Kubernetes operations can use `executor: controller` to queue work.
-- `POST /v1/deployment-operations/{id}/claim`: deployment controller claims queued work.
+- `POST /v1/deployment-operations/{id}/claim`: deployment controller claims queued work, sets `controller_id`, and starts a lease.
+- `POST /v1/deployment-operations/{id}/heartbeat`: deployment controller refreshes `heartbeat_at` and `lease_expires_at`.
 - `POST /v1/deployment-operations/{id}/events`: deployment controller appends execution output or status.
-- `POST /v1/deployment-operations/{id}/complete`: deployment controller marks work `succeeded`, `failed`, or `canceled`.
+- `POST /v1/deployment-operations/{id}/complete`: deployment controller marks work `succeeded`, `failed`, or `canceled`, with optional stdout/stderr summaries.
 
 The CLI command `moira deploy controller run --env dev --watch` implements this
 contract for Kubernetes environments from an operator-controlled process. The
 same executable is published as `ghcr.io/moiraweave-labs/moiraweave-cli:latest`
 and can run as the optional Helm-managed in-cluster deployment controller with
-`deploymentController.enabled=true`.
+`deploymentController.enabled=true`. If a running operation misses its lease,
+Operations Center raises a controller lease alert and a healthy controller can
+reclaim the operation.
 - `GET /v1/environments`: summarize environment names and visible workload/deployment/operation counts.
 - `GET /v1/workloads/{name}/health`: summarize health from environment-scoped deployment state and probe deployment endpoints when present.
 - `POST /v1/channels/{channel}/agents/{name}/messages`: authenticated inbound channel bridge.
