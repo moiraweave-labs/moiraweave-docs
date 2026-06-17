@@ -41,7 +41,10 @@ only reclaimed when the run state says it is safe. This prevents an idle Redis
 pending message from duplicating an agent turn that is still heartbeating.
 Transient executor failures are retried with bounded backoff inside the workload
 timeout, and duplicate dispatch messages for already-active runs are acknowledged
-without re-running the agent action.
+without re-running the agent action. Malformed or unrecoverable dispatch
+messages go to the Redis dead-letter stream; operators can inspect and purge
+them through the API or `moira run dead-letter list|purge` without connecting to
+Redis directly.
 
 ## Agent Flow
 
