@@ -142,13 +142,15 @@ the matching `moira deploy controller run --target kubernetes --env <env>
 --watch` command without exposing kubeconfig or deployment credentials to the
 browser.
 
-API access uses bearer credentials. Local development can issue demo JWTs with
-`DEMO_USERNAME`, `DEMO_PASSWORD`, and `DEMO_ROLE`. Admins can create persistent
-users through `/auth/users`, teams through `/auth/teams`, and team memberships
-through `/auth/teams/{team_id}/members`; persistent users authenticate through
-the same `/auth/token` endpoint with PBKDF2-hashed passwords stored in
-Postgres. Automation should use hashed API keys created by an admin through the
-Security screen or `/auth/api-keys`; keys can optionally be scoped to a team.
+API access uses bearer credentials. Local development can issue demo JWTs when
+`DEMO_AUTH_ENABLED=true` with `DEMO_USERNAME`, `DEMO_PASSWORD`, and
+`DEMO_ROLE`; staging and production overlays disable this bootstrap path.
+Admins can create persistent users through `/auth/users`, teams through
+`/auth/teams`, and team memberships through `/auth/teams/{team_id}/members`;
+persistent users authenticate through the same `/auth/token` endpoint with
+PBKDF2-hashed passwords stored in Postgres. Automation should use hashed API
+keys created by an admin through the Security screen or `/auth/api-keys`; keys
+can optionally be scoped to a team.
 The secret is shown once, then only metadata, team scope, hash, last-use
 timestamp, and revocation state remain in Postgres. Existing keys can be rotated
 with `POST /auth/api-keys/{key_id}/rotate`, which returns a new one-time secret,

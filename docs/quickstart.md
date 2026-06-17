@@ -266,7 +266,7 @@ credentials stay with the operator process or in-cluster ServiceAccount.
 | `moira doctor` warns about transient registry failures | Registry/network timeout, 429, or temporary GHCR issue | Retry `moira up`; Docker may still pull the images. If it persists, login to the registry or override `MOIRAWEAVE_*_IMAGE` |
 | `moira doctor` reports custom images unavailable | The image is private, unpublished, or the registry login is missing | Publish/login to the registry or override `MOIRAWEAVE_*_IMAGE` in `.env` |
 | `moira up` reports missing environment variables | Required workload secrets are not available locally | Run `moira doctor` and follow the readiness guide, or run `moira secrets list`, then add missing names to `.env` or export them |
-| Login fails | Local demo password was overridden | Check `DEMO_USERNAME` and `DEMO_PASSWORD` in `.env` |
+| Login fails | Local demo auth is disabled or the password was overridden | Check `DEMO_AUTH_ENABLED`, `DEMO_USERNAME`, and `DEMO_PASSWORD` in `.env`; use a persistent user in staging/prod |
 | API request returns `403` | The token role is too limited | Use an `operator` or `admin` token for mutating actions |
 | Workload is created but not healthy | Runtime service is missing or not reachable | Use Operations preflight and workload logs |
 | Production looks healthy because local is running | Operations is filtered to the wrong environment | Switch the environment selector to `prod` and rerun preflight |
