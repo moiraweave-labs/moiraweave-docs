@@ -102,6 +102,8 @@ moira run dead-letter replay <message_id>
 
 Dead-letter replay validates the run and workload, records an audit event,
 re-enqueues the worker message, and removes the original dead-letter entry.
+Operations alerts also surface pending Redis Stream dispatch messages so
+operators can distinguish a worker/reclaim issue from an agent-runtime issue.
 
 ## Kubernetes
 

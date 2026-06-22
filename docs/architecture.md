@@ -41,10 +41,14 @@ only reclaimed when the run state says it is safe. This prevents an idle Redis
 pending message from duplicating an agent turn that is still heartbeating.
 Transient executor failures are retried with bounded backoff inside the workload
 timeout, and duplicate dispatch messages for already-active runs are acknowledged
-without re-running the agent action. Malformed or unrecoverable dispatch
-messages go to the Redis dead-letter stream; operators can inspect and purge
-them through the API or `moira run dead-letter list|replay|purge` without
-connecting to Redis directly.
+without re-running the agent action. Retry classification is intentionally
+conservative: transport failures, timeouts, retryable HTTP statuses, and
+runtime-unavailable errors can retry; invalid payloads, bad manifests, missing
+workloads, and deterministic pipeline/DAG errors fail without retry and emit a
+`run.retry_skipped` event. Malformed or unrecoverable dispatch messages go to
+the Redis dead-letter stream; operators can inspect and purge them through the
+API or `moira run dead-letter list|replay|purge` without connecting to Redis
+directly.
 
 ## Agent Flow
 
@@ -109,6 +113,8 @@ core control-plane metrics are deployed with the platform monitoring install.
 The API `/ready` response also reports `run_queue` state, including the Redis
 stream, worker consumer group, attached consumers, pending count, and lag when
 available.
+Operations Center mirrors the same queue signal as an actionable alert when
+Redis reports pending dispatch messages that may need worker recovery or reclaim.
 
 The worker publishes operational counters for long-running workload recovery:
 
