@@ -270,6 +270,39 @@ refreshing while Helm or kubectl commands are still running, so long operations
 remain visibly owned by the controller. If the lease expires, Operations Center
 shows a critical alert and another healthy controller can reclaim the operation.
 
+### Optional kind Controller Smoke
+
+The core repository includes an opt-in smoke test for the Kubernetes controller.
+It is not part of normal CI because it needs a live API, a kube context, Helm,
+kubectl, and permission to create/delete workload resources in the selected
+namespace. The test creates a Demo Agent from the template API, queues
+controller-backed Apply and Logs operations, claims and executes them through
+the CLI controller, then simulates an abandoned Undeploy lease and verifies that
+a healthy controller reclaims it.
+
+Run it from the `moiraweave` repository after the platform API is reachable:
+
+```bash
+MOIRA_TOKEN=<admin-or-operator-token> \
+E2E_BASE_URL=http://localhost:8000 \
+make test-kind-controller
+```
+
+Useful overrides:
+
+```bash
+MOIRAWEAVE_CLI_BIN=/path/to/moira \
+MOIRAWEAVE_KIND_NAMESPACE=moiraweave \
+MOIRAWEAVE_KIND_RELEASE=moiraweave \
+MOIRAWEAVE_KIND_CHART_REF=infra/helm/moiraweave \
+MOIRAWEAVE_KIND_WORKLOAD=kind-demo-agent \
+make test-kind-controller
+```
+
+The smoke intentionally validates the product boundary: the UI/API create and
+observe operations, while the CLI/controller process owns Kubernetes credentials
+and performs Helm/kubectl work.
+
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
