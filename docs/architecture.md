@@ -115,6 +115,9 @@ stream, worker consumer group, attached consumers, pending count, and lag when
 available.
 Operations Center mirrors the same queue signal as an actionable alert when
 Redis reports pending dispatch messages that may need worker recovery or reclaim.
+It also surfaces duplicate dispatch acknowledgements as informational alerts:
+the worker protected an active run from duplicate execution, but sustained
+growth should trigger a producer/reclaim review.
 
 The worker publishes operational counters for long-running workload recovery:
 
