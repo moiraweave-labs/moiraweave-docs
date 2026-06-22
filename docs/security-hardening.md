@@ -105,6 +105,23 @@ re-enqueues the worker message, and removes the original dead-letter entry.
 Operations alerts also surface pending Redis Stream dispatch messages so
 operators can distinguish a worker/reclaim issue from an agent-runtime issue.
 
+## Schema Migrations
+
+Alembic owns the Postgres control-plane schema. The runtime verifies the expected
+Alembic revision during startup and should not run inline DDL in production.
+
+Release validation can run destructive migration checks against a disposable
+Postgres database:
+
+```bash
+MOIRAWEAVE_POSTGRES_MIGRATION_DSN=postgresql://user:pass@host/db \
+MOIRAWEAVE_POSTGRES_MIGRATION_DSN_IS_DISPOSABLE=1 \
+uv run pytest tests/integration/test_control_plane_postgres_migrations.py --no-cov
+```
+
+The test drops and recreates the `public` schema. Never point it at shared,
+staging, or production databases.
+
 ## Kubernetes
 
 Keep the UI away from kubeconfig and Docker credentials. For Kubernetes apply,
