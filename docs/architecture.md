@@ -176,6 +176,10 @@ credential type before enabling mutating actions. The initial role model is
 intentionally small: `viewer` can inspect, `operator` can run, cancel, message
 agents, preflight, and record deployment operations, and `admin` can create
 workloads, inspect secret inventory, and manage users, teams, and API keys.
+Admins see all control-plane resources. Non-admin users see resources owned by
+their own subject plus resources owned by members of their teams; team-scoped
+API keys inherit the same effective visibility through their subject and
+`team_id`.
 
 Secret inventory is deliberately metadata-only. The API returns required names,
 presence, source, workload references, and remediation; it does not return
@@ -227,7 +231,9 @@ namespace-scoped RBAC. The controller consumes an admin token from
 local workspace exists, applies the published OCI chart
 `oci://ghcr.io/moiraweave-labs/charts/moiraweave`, fetches workload logs, and
 deletes workload runtime resources by MoiraWeave labels while keeping kubeconfig
-outside the UI.
+outside the UI. While a Helm or kubectl command is running, the CLI controller
+continues refreshing the deployment-operation heartbeat so long operations do
+not look abandoned merely because the command is still executing.
 
 The CLI is still required for workspace-local actions that need filesystem,
 Docker, Helm, or Kubernetes credentials: `moira init`, `moira up`, Compose/Helm

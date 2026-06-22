@@ -46,8 +46,10 @@ moira security api-key create "agent deploy" deploy-bot --role operator --team-i
 ```
 
 The `mwk_...` secret is shown once. MoiraWeave stores only the hash, prefix,
-subject, role, optional team scope, timestamps, and revocation state. Rotate and
-revoke keys explicitly:
+subject, role, optional team scope, timestamps, and revocation state. Admins can
+see all resources; non-admin users and team-scoped keys see resources owned by
+their own subject plus members of their teams. Rotate and revoke keys
+explicitly:
 
 ```bash
 moira security api-key rotate <key_id>
@@ -121,7 +123,8 @@ Production Helm values should set:
 - persistent artifact storage with backups
 
 Deployment controller operations store `controller_id`, `heartbeat_at`, and
-`lease_expires_at` in Postgres. Treat expired leases as operational incidents:
+`lease_expires_at` in Postgres. The CLI controller renews heartbeats while Helm
+or kubectl commands are running. Treat expired leases as operational incidents:
 restart the controller, check its logs, then let a healthy controller reclaim the
 operation rather than editing Redis/Postgres manually.
 
