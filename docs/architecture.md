@@ -50,6 +50,16 @@ the Redis dead-letter stream; operators can inspect and purge them through the
 API or `moira run dead-letter list|replay|purge` without connecting to Redis
 directly.
 
+## Event Delivery For Long Runs
+
+Run history is durable in Postgres, but live consumers do not repeatedly read
+the whole timeline. `GET /v1/runs/{run_id}/events` accepts `after_id` and
+`limit` for incremental reads, or `tail=true` to open the recent portion of a
+long timeline. `GET /v1/runs/{run_id}/events/stream` honors `Last-Event-ID` and
+uses the same cursor internally. The dashboard first loads the recent timeline
+and then resumes from its latest event, so reconnects do not replay days of
+agent activity.
+
 ## Agent Flow
 
 Agent workloads use an adapter. The adapter sends a short-lived dispatch call to
