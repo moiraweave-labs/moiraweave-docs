@@ -60,6 +60,11 @@ uses the same cursor internally. The dashboard first loads the recent timeline
 and then resumes from its latest event, so reconnects do not replay days of
 agent activity.
 
+Agent session lists use bounded `limit`/`offset` pages. Agent message history
+opens the latest bounded page and uses `before_id` to load earlier messages in
+chronological order. These controls keep a long-lived conversation usable
+without asking the browser or API gateway to materialize its entire history.
+
 ## Agent Flow
 
 Agent workloads use an adapter. The adapter sends a short-lived dispatch call to
