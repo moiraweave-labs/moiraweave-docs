@@ -36,6 +36,9 @@ control plane for model services, pipelines, and agent runtimes.
 - Users and teams are product concepts: the demo admin is only a bootstrap path;
   persistent users, teams, memberships, and team-scoped API keys live in
   Postgres.
+- Workload scope is explicit: a workload is shared inside the platform unless
+  `metadata.annotations["moiraweave.io/team-id"]` names a team. Team-scoped
+  workloads are visible and runnable only by that team's members and admins.
 - API keys are one-time secret values: the dashboard/API returns the `mwk_...`
   secret only when an admin creates it. After that, MoiraWeave stores metadata,
   team scope, a hash, last-use timestamp, and revocation state. Rotating a key

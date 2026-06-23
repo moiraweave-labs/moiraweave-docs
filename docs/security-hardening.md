@@ -56,6 +56,26 @@ moira security api-key rotate <key_id>
 moira security api-key revoke <key_id>
 ```
 
+## Workload Ownership
+
+Workloads are shared platform definitions by default, so operators can use a
+centrally registered runtime without duplicating its manifest. To make a
+workload private to a team, select the team in the dashboard's **Create
+Workload** form or add this annotation in the advanced manifest:
+
+```yaml
+metadata:
+  name: research-agent
+  annotations:
+    moiraweave.io/team-id: agents
+```
+
+The named team must already exist. Only its members and admins can list, inspect,
+preflight, deploy, create sessions for, or run that workload. The team ownership
+is stored with the manifest and is preserved when an admin updates the manifest
+without specifying a new team. The registered creator remains audit metadata;
+it does not make an unscoped workload private.
+
 ## Secrets
 
 Workload manifests should declare required secret names, not values. Keep values
