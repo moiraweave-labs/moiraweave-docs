@@ -321,7 +321,7 @@ and performs Helm/kubectl work.
 | Runs never start and dead-letter count grows | Worker cannot parse or resolve dispatch messages | Run `moira run dead-letter list`; inspect the reason, fix the root cause, then use `moira run dead-letter replay <message-id>` or purge with `moira run dead-letter purge <message-id>` |
 | Workload is created but not healthy | Runtime service is missing or not reachable | Use Operations preflight and workload logs |
 | Production looks healthy because local is running | Operations is filtered to the wrong environment | Switch the environment selector to `prod` and rerun preflight |
-| A teammate changed/canceled/accessed something | Audit trail is needed | Query `/v1/audit-events` with `action`, `resource_type`, or `resource_id` filters |
+| A teammate changed/canceled/accessed something | Audit trail is needed | Query `/v1/audit-events` with `action`, `resource_type`, `resource_id`, or `env` filters |
 | `/ready` shows `run_queue: degraded` | Worker consumer group is missing or no worker is attached | Start/restart the worker and check Redis connectivity |
 | Agent message stays queued | Worker is stopped, Redis is unavailable, or no worker consumer is attached | Run Operations preflight and check `worker_dispatch`, `/ready`, worker logs, and Redis connectivity |
 | Agent run fails after dispatch timeout | Runtime did not acknowledge quickly | Configure adapter paths or return an early ack before long work |

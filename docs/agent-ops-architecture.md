@@ -190,4 +190,4 @@ reclaim the operation.
 - `POST /v1/webhooks/{channel}/agents/{name}/messages`: signed inbound webhook
   bridge using `X-MoiraWeave-Signature: sha256=<hmac>`.
 - `GET /v1/agents/{name}/sessions/{session_id}/health`: summarize a session and its latest run.
-- `GET /v1/audit-events`: list the authenticated subject's audit events, with filters for action and resource.
+- `GET /v1/audit-events`: list the authenticated subject's audit events, with filters for action, resource, and deployment environment (`env`).
