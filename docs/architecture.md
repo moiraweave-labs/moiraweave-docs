@@ -65,6 +65,10 @@ opens the latest bounded page and uses `before_id` to load earlier messages in
 chronological order. These controls keep a long-lived conversation usable
 without asking the browser or API gateway to materialize its entire history.
 
+Artifact Library uses the same bounded `limit`/`offset` contract while retaining
+its workload, environment, session, run, date, and content-type filters. The
+dashboard only fetches additional artifact pages when an operator asks for them.
+
 ## Agent Flow
 
 Agent workloads use an adapter. The adapter sends a short-lived dispatch call to
