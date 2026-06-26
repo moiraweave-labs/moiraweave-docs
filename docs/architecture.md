@@ -69,6 +69,11 @@ Artifact Library uses the same bounded `limit`/`offset` contract while retaining
 its workload, environment, session, run, date, and content-type filters. The
 dashboard only fetches additional artifact pages when an operator asks for them.
 
+Runs, deployment operations, and audit events also use bounded `limit`/`offset`
+pages in the dashboard. Operators can load older pages explicitly, which keeps
+high-volume Operations Center views responsive without hiding the API filters
+for workload, target, environment, action, or resource.
+
 ## Agent Flow
 
 Agent workloads use an adapter. The adapter sends a short-lived dispatch call to
