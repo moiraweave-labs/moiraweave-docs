@@ -64,6 +64,9 @@ Agent session lists use bounded `limit`/`offset` pages. Agent message history
 opens the latest bounded page and uses `before_id` to load earlier messages in
 chronological order. These controls keep a long-lived conversation usable
 without asking the browser or API gateway to materialize its entire history.
+For active agent turns, Agent Console also opens the run event stream for the
+focused message and shows live/degraded stream state beside the persisted event
+timeline, so the operator can see runtime progress without leaving the chat.
 
 Artifact Library uses the same bounded `limit`/`offset` contract while retaining
 its workload, environment, session, run, date, and content-type filters. The
@@ -172,8 +175,9 @@ The Ops dashboard covers API-level operations: guided workload creation,
 advanced manifest registration, run submission, run cancellation, live events,
 artifact browsing, local/PVC artifact preview and download, metadata
 inspection, cross-links from artifacts back to runs and agent sessions, agent
-session health, agent messages, channel ownership, preflight, deployment
-planning, secret inventory, deployment record sync, and health.
+session health, agent messages with focused live turn status, channel ownership,
+preflight, deployment planning, secret inventory, deployment record sync, and
+health.
 Operations Center keeps the selected environment explicit so an operator can
 compare created, deployed, reachable, and healthy state without mixing local and
 cluster records. Its deployment readiness guide uses the same product language
