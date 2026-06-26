@@ -192,8 +192,9 @@ API access uses bearer credentials. Local development can issue demo JWTs when
 `DEMO_ROLE`; staging and production should disable demo auth. When demo auth is
 disabled and no persistent admin exists, `POST /auth/bootstrap/admin` or
 `moira security bootstrap-admin` creates the first admin and then closes that
-bootstrap path. Admins can create persistent users through `/auth/users`, teams
-through `/auth/teams`, and team memberships through
+bootstrap path. Admins can create and update persistent users through
+`/auth/users`, reset or rotate user access, create and update teams through
+`/auth/teams`, and manage team memberships through
 `/auth/teams/{team_id}/members`; persistent users authenticate through the same
 `/auth/token` endpoint with PBKDF2-hashed passwords stored in Postgres.
 Automation should use hashed API keys created by an admin through the Security
