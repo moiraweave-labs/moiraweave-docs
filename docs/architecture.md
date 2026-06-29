@@ -298,7 +298,9 @@ artifact URIs remain metadata-only unless a storage connector is added.
   authenticated connectors call `/v1/channels/{channel}/agents/{name}/messages`;
   external webhook connectors call
   `/v1/webhooks/{channel}/agents/{name}/messages` with
-  `X-MoiraWeave-Signature: sha256=<hmac>`.
+  `X-MoiraWeave-Signature: sha256=<hmac>`. Team-scoped webhook connectors put
+  `team_id` in the signed JSON body so MoiraWeave can authorize the message
+  against the same workload/session scope as UI and API users.
 
 ## Further Reading
 

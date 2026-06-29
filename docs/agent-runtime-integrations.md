@@ -106,7 +106,10 @@ channel names to lowercase and only accepts
 `/v1/webhooks/{channel}/agents/{name}/messages` without bearer auth, but they
 must sign the raw JSON body with `WEBHOOK_SIGNING_SECRET` and send
 `X-MoiraWeave-Signature: sha256=<hmac>`. Signed webhooks still follow the same
-session, run, audit, and channel-ownership rules.
+session, run, audit, and channel-ownership rules. For team-scoped workloads,
+include `team_id` in the signed JSON body; MoiraWeave uses that team as the
+webhook subject scope, records it in the channel/session context, and rejects
+the message if the signed team cannot see the workload.
 
 Use `externalOwnedChannels` for integrations that the runtime owns itself. For
 example, if a Hermes profile already runs its own Telegram bridge, declare

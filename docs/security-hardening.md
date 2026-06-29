@@ -110,6 +110,11 @@ Telegram, Slack, Discord, or another channel directly, declare it under
 `externalOwnedChannels` and supervise it from MoiraWeave instead of duplicating
 traffic.
 
+For team-scoped workloads, put `team_id` in the signed JSON body. MoiraWeave
+uses that team as the webhook subject scope and stores it in channel/session
+metadata and audit context. Do not send team scope in an unsigned header or URL
+parameter.
+
 ## Operations
 
 Use Operations Center or CLI alerts before touching Redis/Postgres directly:
