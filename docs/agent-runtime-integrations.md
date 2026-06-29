@@ -110,6 +110,8 @@ session, run, audit, and channel-ownership rules. For team-scoped workloads,
 include `team_id` in the signed JSON body; MoiraWeave uses that team as the
 webhook subject scope, records it in the channel/session context, and rejects
 the message if the signed team cannot see the workload.
+Bearer-authenticated channel requests can also include `team_id`, but it must
+be visible to the calling user or API key.
 
 Use `externalOwnedChannels` for integrations that the runtime owns itself. For
 example, if a Hermes profile already runs its own Telegram bridge, declare
