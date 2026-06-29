@@ -113,7 +113,7 @@
   <text x="60" y="65" class="title">MoiraWeave Layered Architecture</text>
   <text x="60" y="92" class="subtitle">Platform architecture outlining layer boundaries, execution interfaces, and asset ownership.</text>
 
-  <!-- Connection Lines (Left side representing workflow pipeline) -->
+  <!-- Connection Lines (control-plane flow) -->
   <line x1="600" y1="262" x2="600" y2="288" class="conn-line" marker-end="url(#glow-arrow)"/>
   <line x1="600" y1="452" x2="600" y2="478" class="conn-line" marker-end="url(#glow-arrow)"/>
 
@@ -132,15 +132,15 @@
     <rect x="130" y="210" width="100" height="24" class="badge-bg-1" />
     <text x="145" y="226" class="badge-text-1">workload.yaml</text>
     
-    <rect x="240" y="210" width="130" height="24" class="badge-bg-1" />
-    <text x="255" y="226" class="badge-text-1">Custom Pipelines</text>
+    <rect x="240" y="210" width="135" height="24" class="badge-bg-1" />
+    <text x="255" y="226" class="badge-text-1">Workload Specs</text>
 
-    <rect x="380" y="210" width="130" height="24" class="badge-bg-1" />
-    <text x="395" y="226" class="badge-text-1">Secrets &amp; Configs</text>
+    <rect x="385" y="210" width="140" height="24" class="badge-bg-1" />
+    <text x="400" y="226" class="badge-text-1">Secrets &amp; Policies</text>
 
     <!-- Description -->
     <text x="560" y="180" class="card-body">Contains workloads declarations, deployment values, target configs,</text>
-    <text x="560" y="205" class="card-body">and step overrides which run on behalf of the users.</text>
+    <text x="560" y="205" class="card-body">and operational policy for model, pipeline, and agent runtimes.</text>
   </g>
 
   <!-- ================= LAYER 2: CATALOG LAYER ================= -->
@@ -155,18 +155,18 @@
     <text x="130" y="371" class="card-meta">Official and shared library</text>
     
     <!-- Badges -->
-    <rect x="130" y="385" width="110" height="24" class="badge-bg-2" />
-    <text x="145" y="401" class="badge-text-2">Official Steps</text>
+    <rect x="130" y="385" width="125" height="24" class="badge-bg-2" />
+    <text x="145" y="401" class="badge-text-2">Adapter Library</text>
     
-    <rect x="250" y="385" width="140" height="24" class="badge-bg-2" />
-    <text x="265" y="401" class="badge-text-2">Versioned Schemas</text>
+    <rect x="265" y="385" width="140" height="24" class="badge-bg-2" />
+    <text x="280" y="401" class="badge-text-2">Versioned Schemas</text>
 
-    <rect x="400" y="385" width="120" height="24" class="badge-bg-2" />
-    <text x="415" y="401" class="badge-text-2">Image Registry</text>
+    <rect x="415" y="385" width="120" height="24" class="badge-bg-2" />
+    <text x="430" y="401" class="badge-text-2">Image Registry</text>
 
     <!-- Description -->
-    <text x="560" y="355" class="card-body">Provides reusable building blocks, verified base execution steps,</text>
-    <text x="560" y="380" class="card-body">and schemas that can be compiled across multiple environments.</text>
+    <text x="560" y="355" class="card-body">Provides workload templates, runtime adapters, deployment defaults,</text>
+    <text x="560" y="380" class="card-body">and schemas that compile across local and Kubernetes environments.</text>
   </g>
 
   <!-- ================= LAYER 3: RUNTIME LAYER ================= -->
