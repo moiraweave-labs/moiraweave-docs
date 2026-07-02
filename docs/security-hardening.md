@@ -159,6 +159,12 @@ logs, and undeploy operations, use one of these executor paths:
 Production Helm values should set:
 
 - `demoAuth.enabled=false`
+- `postgresDsn.existingSecret` and `postgresDsn.secretKey` so API and worker
+  read `POSTGRES_DSN` from Kubernetes Secret references instead of rendered
+  manifests
+- Bitnami Postgres `auth.existingSecret` keys for `POSTGRES_PASSWORD` and
+  `POSTGRES_POSTGRES_PASSWORD`; keep those values in Kubernetes Secrets or an
+  external secret manager
 - controller token Secret when the deployment controller is enabled; Helm fails
   template rendering if `deploymentController.auth.existingSecret` or
   `deploymentController.auth.tokenKey` is empty

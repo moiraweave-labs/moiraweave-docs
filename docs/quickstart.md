@@ -249,8 +249,22 @@ moira deploy controller run --env dev --watch
 ```
 
 For long-lived Kubernetes environments, enable the in-cluster controller in the
-MoiraWeave Helm chart. Create a token secret first; use an admin API key or
-admin bearer token because the controller claims queued operations across users:
+MoiraWeave Helm chart. Create the platform Secret first. It contains only names
+that the chart reads from Kubernetes; MoiraWeave never stores or displays these
+secret values:
+
+```bash
+kubectl create secret generic moiraweave-secrets \
+  --from-literal=JWT_SECRET_KEY=<32-char-secret> \
+  --from-literal=POSTGRES_DSN=postgresql://moiraweave:<postgres-password>@moiraweave-postgresql:5432/moiraweave \
+  --from-literal=POSTGRES_PASSWORD=<postgres-password> \
+  --from-literal=POSTGRES_POSTGRES_PASSWORD=<postgres-admin-password> \
+  --from-literal=REDIS_PASSWORD=<redis-password> \
+  --namespace moiraweave
+```
+
+Then create a token secret; use an admin API key or admin bearer token because
+the controller claims queued operations across users:
 
 ```bash
 kubectl create secret generic moiraweave-controller-token \
