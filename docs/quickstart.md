@@ -189,6 +189,10 @@ For real agent runtimes, create them from the UI templates or CLI manifests.
 `moira init` and `moira demo agent` remain available when you want explicit
 setup steps, but they are not required for the first local demo.
 
+For a complete UI-first walkthrough with secrets, local deploy, Kubernetes
+controller, external runtime, and troubleshooting, see
+[Deploy A Real Hermes Agent](deploy-hermes.md).
+
 ```bash
 moira workload new hermes \
   --type agent-service \

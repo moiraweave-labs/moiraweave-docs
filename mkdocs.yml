@@ -74,6 +74,7 @@ nav:
   - Home: index.md
   - Getting Started:
       - Quickstart: quickstart.md
+      - Deploy Hermes: deploy-hermes.md
       - Concepts: concepts.md
       - Security Hardening: security-hardening.md
   - Architecture:
