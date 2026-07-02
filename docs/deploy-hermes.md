@@ -6,6 +6,10 @@ deploys or connects the runtime, stores sessions/runs/events/artifacts, and
 shows health. Hermes keeps ownership of its tools, memory, model provider,
 browser or terminal backends, MCP servers, and native channels.
 
+If you want to provision a VM, install Kubernetes, bootstrap the platform, and
+prove the full UI/controller/Hermes flow end to end, use
+[Full Deployment Trial](full-deployment-trial.md).
+
 Use the UI for workload creation, preflight, deployment operations, chat,
 events, logs, artifacts, and health. Use CLI or a Kubernetes controller only for
 actions that need host Docker access, kubeconfig, or secret values.
