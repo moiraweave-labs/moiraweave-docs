@@ -16,6 +16,13 @@ uv tool install moiraweave-cli
 moira --help
 ```
 
+`uv tool install moiraweave-cli` uses PyPI to install the CLI. PyPI is not part
+of the running MoiraWeave platform: `moira up`, Compose, Kubernetes, API
+Gateway, worker, UI, and workloads use GHCR images and the OCI Helm chart. If
+PyPI is unavailable, install the CLI from a local checkout with `uv tool install
+.` inside `moiraweave-cli`, or use the published CLI image
+`ghcr.io/moiraweave-labs/moiraweave-cli:latest` in CI or controller contexts.
+
 ## 2. Start The Local Product
 
 ```bash
@@ -308,6 +315,7 @@ and performs Helm/kubectl work.
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
 | `moira` command not found | CLI is not installed in the active shell | Re-run `uv tool install moiraweave-cli` |
+| `uv tool install moiraweave-cli` cannot reach PyPI | PyPI/network access is unavailable, or the CLI package has not been published yet | Install from a local `moiraweave-cli` checkout with `uv tool install .`, or use the published CLI image for CI/controller operations |
 | `moira up` stops before Docker starts | `moira doctor` found a blocking local issue | Fix the ERROR rows from `moira doctor`, then rerun `moira up` |
 | `moira up` cannot start containers | Docker is stopped or the port is busy | Run `moira doctor`, start Docker, and check ports 8000/3000/5432/6379 |
 | `moira doctor` reports official images unavailable | GHCR images were pushed but package visibility is not public | In GitHub Packages, set `moiraweave/api-gateway`, `moiraweave/worker`, and `moiraweave-ui` to public, then rerun `moira doctor` |
